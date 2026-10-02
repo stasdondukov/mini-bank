@@ -1,4 +1,4 @@
-﻿package bank;
+package bank;
 
 public abstract class BankAccount {
     private final String number;

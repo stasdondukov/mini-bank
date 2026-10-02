@@ -1,4 +1,4 @@
-﻿package bank;
+package bank;
 
 public class DebitAccount extends BankAccount {
 
