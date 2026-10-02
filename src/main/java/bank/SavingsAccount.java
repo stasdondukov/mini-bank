@@ -1,4 +1,4 @@
-﻿package bank;
+package bank;
 
 public class SavingsAccount extends BankAccount {
     private final double minimumBalance;
