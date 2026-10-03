@@ -20,6 +20,18 @@ public class BankAccountEqualityTest {
     }
 
     @Test
+    void accountEqualsItself() {
+        BankAccount a = new DebitAccount("001", "Ivan", 1000.0);
+        assertEquals(a, a);
+    }
+
+    @Test
+    void accountDoesNotEqualNull() {
+        BankAccount a = new DebitAccount("001", "Ivan", 1000.0);
+        assertNotEquals(null, a);
+    }
+
+    @Test
     void equalAccountsHaveSameHashCode() {
         BankAccount a = new DebitAccount("001", "Ivan", 1000.0);
         BankAccount b = new DebitAccount("001", "Ivan", 5000.0);
@@ -45,17 +57,5 @@ public class BankAccountEqualityTest {
         BankAccount savings = new SavingsAccount("001", "Ivan", 1000.0, 100.0);
         BankAccount credit = new CreditAccount("001", "Ivan", 1000.0, 5000.0);
         assertEquals(savings, credit);
-    }
-
-    @Test
-    void accountIsEqualToItself() {
-        BankAccount a = new DebitAccount("001", "Ivan", 1000.0);
-        assertEquals(a, a);
-    }
-
-    @Test
-    void accountIsNotEqualToNull() {
-        BankAccount a = new DebitAccount("001", "Ivan", 1000.0);
-        assertNotEquals(null, a);
     }
 }
