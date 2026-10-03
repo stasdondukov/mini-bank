@@ -7,8 +7,8 @@ public class TransferServiceTest {
 
     @Test
     void successfulTransferChangesBothBalances() {
-        BankAccount from = new DebitAccount("1", "A", 10000.0);
-        BankAccount to = new DebitAccount("2", "B", 2000.0);
+        BankAccount from = new DebitAccount("0000000001", "A", 10000.0);
+        BankAccount to = new DebitAccount("0000000002", "B", 2000.0);
         FakeNotificationService notificationService = new FakeNotificationService();
         TransferService service = new TransferService(new NoCommission(), notificationService);
 
@@ -21,8 +21,8 @@ public class TransferServiceTest {
 
     @Test
     void failedTransferDoesNotChangeAnyBalance() {
-        BankAccount from = new DebitAccount("1", "A", 1000.0);
-        BankAccount to = new DebitAccount("2", "B", 2000.0);
+        BankAccount from = new DebitAccount("0000000001", "A", 1000.0);
+        BankAccount to = new DebitAccount("0000000002", "B", 2000.0);
         FakeNotificationService notificationService = new FakeNotificationService();
         TransferService service = new TransferService(new NoCommission(), notificationService);
 
@@ -35,8 +35,8 @@ public class TransferServiceTest {
 
     @Test
     void cannotTransferNegativeAmount() {
-        BankAccount from = new DebitAccount("1", "A", 10000.0);
-        BankAccount to = new DebitAccount("2", "B", 2000.0);
+        BankAccount from = new DebitAccount("0000000001", "A", 10000.0);
+        BankAccount to = new DebitAccount("0000000002", "B", 2000.0);
         FakeNotificationService notificationService = new FakeNotificationService();
         TransferService service = new TransferService(new NoCommission(), notificationService);
 
@@ -49,8 +49,8 @@ public class TransferServiceTest {
 
     @Test
     void cannotTransferZeroAmount() {
-        BankAccount from = new DebitAccount("1", "A", 10000.0);
-        BankAccount to = new DebitAccount("2", "B", 2000.0);
+        BankAccount from = new DebitAccount("0000000001", "A", 10000.0);
+        BankAccount to = new DebitAccount("0000000002", "B", 2000.0);
         FakeNotificationService notificationService = new FakeNotificationService();
         TransferService service = new TransferService(new NoCommission(), notificationService);
 
@@ -63,7 +63,7 @@ public class TransferServiceTest {
 
     @Test
     void cannotTransferToSameAccount() {
-        BankAccount account = new DebitAccount("1", "A", 10000.0);
+        BankAccount account = new DebitAccount("0000000001", "A", 10000.0);
         FakeNotificationService notificationService = new FakeNotificationService();
         TransferService service = new TransferService(new NoCommission(), notificationService);
 
@@ -75,8 +75,8 @@ public class TransferServiceTest {
 
     @Test
     void commissionIsDeductedFromSender() {
-        BankAccount from = new DebitAccount("1", "A", 11000.0);
-        BankAccount to = new DebitAccount("2", "B", 2000.0);
+        BankAccount from = new DebitAccount("0000000001", "A", 11000.0);
+        BankAccount to = new DebitAccount("0000000002", "B", 2000.0);
         FakeNotificationService notificationService = new FakeNotificationService();
         TransferService service = new TransferService(new PercentCommission(1.0), notificationService);
 
@@ -88,8 +88,8 @@ public class TransferServiceTest {
 
     @Test
     void receiverGetsExactlyTransferAmount() {
-        BankAccount from = new DebitAccount("1", "A", 11000.0);
-        BankAccount to = new DebitAccount("2", "B", 2000.0);
+        BankAccount from = new DebitAccount("0000000001", "A", 11000.0);
+        BankAccount to = new DebitAccount("0000000002", "B", 2000.0);
         FakeNotificationService notificationService = new FakeNotificationService();
         TransferService service = new TransferService(new PercentCommission(1.0), notificationService);
 
@@ -101,8 +101,8 @@ public class TransferServiceTest {
 
     @Test
     void transferFailsWhenInsufficientFundsForAmountWithCommission() {
-        BankAccount from = new DebitAccount("1", "A", 10000.0);
-        BankAccount to = new DebitAccount("2", "B", 2000.0);
+        BankAccount from = new DebitAccount("0000000001", "A", 10000.0);
+        BankAccount to = new DebitAccount("0000000002", "B", 2000.0);
         FakeNotificationService notificationService = new FakeNotificationService();
         TransferService service = new TransferService(new PercentCommission(1.0), notificationService);
 
@@ -115,8 +115,8 @@ public class TransferServiceTest {
 
     @Test
     void transferFromDebitAccountToDebitAccount() {
-        BankAccount from = new DebitAccount("1", "A", 5000.0);
-        BankAccount to = new DebitAccount("2", "B", 1000.0);
+        BankAccount from = new DebitAccount("0000000001", "A", 5000.0);
+        BankAccount to = new DebitAccount("0000000002", "B", 1000.0);
         FakeNotificationService notificationService = new FakeNotificationService();
         TransferService service = new TransferService(new NoCommission(), notificationService);
 
@@ -129,8 +129,8 @@ public class TransferServiceTest {
 
     @Test
     void transferFromDebitAccountToSavingsAccount() {
-        BankAccount from = new DebitAccount("1", "A", 5000.0);
-        BankAccount to = new SavingsAccount("2", "B", 2000.0, 1000.0);
+        BankAccount from = new DebitAccount("0000000001", "A", 5000.0);
+        BankAccount to = new SavingsAccount("0000000002", "B", 2000.0, 1000.0);
         FakeNotificationService notificationService = new FakeNotificationService();
         TransferService service = new TransferService(new NoCommission(), notificationService);
 
@@ -143,8 +143,8 @@ public class TransferServiceTest {
 
     @Test
     void transferFromCreditAccountToDebitAccount() {
-        BankAccount from = new CreditAccount("1", "A", 500.0, 3000.0);
-        BankAccount to = new DebitAccount("2", "B", 1000.0);
+        BankAccount from = new CreditAccount("0000000001", "A", 500.0, 3000.0);
+        BankAccount to = new DebitAccount("0000000002", "B", 1000.0);
         FakeNotificationService notificationService = new FakeNotificationService();
         TransferService service = new TransferService(new NoCommission(), notificationService);
 
@@ -157,8 +157,8 @@ public class TransferServiceTest {
 
     @Test
     void transferFromSavingsAccountToDebitAccount() {
-        BankAccount from = new SavingsAccount("1", "A", 5000.0, 1000.0);
-        BankAccount to = new DebitAccount("2", "B", 1000.0);
+        BankAccount from = new SavingsAccount("0000000001", "A", 5000.0, 1000.0);
+        BankAccount to = new DebitAccount("0000000002", "B", 1000.0);
         FakeNotificationService notificationService = new FakeNotificationService();
         TransferService service = new TransferService(new NoCommission(), notificationService);
 
@@ -171,8 +171,8 @@ public class TransferServiceTest {
 
     @Test
     void exactlyOneNotificationSentAfterSuccessfulTransfer() {
-        BankAccount from = new DebitAccount("1", "A", 10000.0);
-        BankAccount to = new DebitAccount("2", "B", 2000.0);
+        BankAccount from = new DebitAccount("0000000001", "A", 10000.0);
+        BankAccount to = new DebitAccount("0000000002", "B", 2000.0);
         FakeNotificationService notificationService = new FakeNotificationService();
         TransferService service = new TransferService(new NoCommission(), notificationService);
 
@@ -185,8 +185,8 @@ public class TransferServiceTest {
 
     @Test
     void notificationNotSentAfterFailedTransfer() {
-        BankAccount from = new DebitAccount("1", "A", 1000.0);
-        BankAccount to = new DebitAccount("2", "B", 2000.0);
+        BankAccount from = new DebitAccount("0000000001", "A", 1000.0);
+        BankAccount to = new DebitAccount("0000000002", "B", 2000.0);
         FakeNotificationService notificationService = new FakeNotificationService();
         TransferService service = new TransferService(new NoCommission(), notificationService);
 
@@ -199,8 +199,8 @@ public class TransferServiceTest {
 
     @Test
     void notificationMessageMatchesExpectedFormat() {
-        BankAccount from = new DebitAccount("1", "A", 10000.0);
-        BankAccount to = new DebitAccount("2", "B", 2000.0);
+        BankAccount from = new DebitAccount("0000000001", "A", 10000.0);
+        BankAccount to = new DebitAccount("0000000002", "B", 2000.0);
         FakeNotificationService notificationService = new FakeNotificationService();
         TransferService service = new TransferService(new PercentCommission(2.0), notificationService);
 
@@ -210,3 +210,4 @@ public class TransferServiceTest {
         assertEquals("Transfer 5000.0 completed", notificationService.getLastMessage());
     }
 }
+

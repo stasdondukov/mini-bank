@@ -7,7 +7,7 @@ public class SavingsAccountTest {
 
     @Test
     void canWithdrawWhenMinimumBalanceIsPreserved() {
-        SavingsAccount account = new SavingsAccount("201", "Ольга", 10000.0, 1000.0);
+        SavingsAccount account = new SavingsAccount("0000000201", "Ольга", 10000.0, 1000.0);
         boolean result = account.withdraw(8500.0);
         assertTrue(result);
         assertEquals(1500.0, account.getBalance());
@@ -15,7 +15,7 @@ public class SavingsAccountTest {
 
     @Test
     void cannotWithdrawBelowMinimumBalance() {
-        SavingsAccount account = new SavingsAccount("201", "Ольга", 1500.0, 1000.0);
+        SavingsAccount account = new SavingsAccount("0000000201", "Ольга", 1500.0, 1000.0);
         boolean result = account.withdraw(1000.0);
         assertFalse(result);
         assertEquals(1500.0, account.getBalance());
@@ -23,9 +23,10 @@ public class SavingsAccountTest {
 
     @Test
     void balanceDoesNotChangeOnFailedWithdrawal() {
-        SavingsAccount account = new SavingsAccount("201", "Ольга", 1500.0, 1000.0);
+        SavingsAccount account = new SavingsAccount("0000000201", "Ольга", 1500.0, 1000.0);
         boolean result = account.withdraw(2000.0);
         assertFalse(result);
         assertEquals(1500.0, account.getBalance());
     }
 }
+
