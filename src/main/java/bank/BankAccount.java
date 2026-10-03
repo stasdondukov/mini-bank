@@ -37,4 +37,13 @@ public abstract class BankAccount {
     public String getOwner() {
         return owner;
     }
+
+    @Override
+    public String toString() {
+        return getClass().getSimpleName() + "{" +
+                "number='" + number + '\'' +
+                ", owner='" + owner + '\'' +
+                ", balance=" + balance +
+                '}';
+    }
 }
