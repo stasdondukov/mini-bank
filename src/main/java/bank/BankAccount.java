@@ -39,6 +39,18 @@ public abstract class BankAccount {
     }
 
     @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof BankAccount other)) return false;
+        return number.equals(other.number);
+    }
+
+    @Override
+    public int hashCode() {
+        return number.hashCode();
+    }
+
+    @Override
     public String toString() {
         return getClass().getSimpleName() + "{" +
                 "number='" + number + '\'' +
