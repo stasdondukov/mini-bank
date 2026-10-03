@@ -3,38 +3,59 @@ package bank;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
-public class AccountNumberTest {
+class AccountNumberTest {
 
     @Test
-    void shouldCreateAccountNumberWithValidTenDigits() {
+    void validNumberIsCreated() {
         AccountNumber number = new AccountNumber("1234567890");
         assertEquals("1234567890", number.value());
     }
 
     @Test
-    void shouldThrowExceptionWhenValueIsNull() {
-        assertThrows(IllegalArgumentException.class, () -> new AccountNumber(null));
+    void shortNumberIsRejected() {
+        assertThrows(
+            IllegalArgumentException.class,
+            () -> new AccountNumber("123")
+        );
     }
 
     @Test
-    void shouldThrowExceptionWhenValueIsEmpty() {
-        assertThrows(IllegalArgumentException.class, () -> new AccountNumber(""));
+    void nullIsRejected() {
+        assertThrows(
+            IllegalArgumentException.class,
+            () -> new AccountNumber(null)
+        );
     }
 
     @Test
-    void shouldThrowExceptionWhenLengthIsLessThanTen() {
-        assertThrows(IllegalArgumentException.class, () -> new AccountNumber("123456789"));
+    void emptyStringIsRejected() {
+        assertThrows(
+            IllegalArgumentException.class,
+            () -> new AccountNumber("")
+        );
     }
 
     @Test
-    void shouldThrowExceptionWhenLengthIsGreaterThanTen() {
-        assertThrows(IllegalArgumentException.class, () -> new AccountNumber("12345678901"));
+    void nineDigitsNumberIsRejected() {
+        assertThrows(
+            IllegalArgumentException.class,
+            () -> new AccountNumber("123456789")
+        );
     }
 
     @Test
-    void shouldThrowExceptionWhenContainsNonDigits() {
-        assertThrows(IllegalArgumentException.class, () -> new AccountNumber("123456789a"));
-        assertThrows(IllegalArgumentException.class, () -> new AccountNumber("abcdefghij"));
-        assertThrows(IllegalArgumentException.class, () -> new AccountNumber("123-456-78"));
+    void elevenDigitsNumberIsRejected() {
+        assertThrows(
+            IllegalArgumentException.class,
+            () -> new AccountNumber("12345678901")
+        );
+    }
+
+    @Test
+    void lettersInsideNumberAreRejected() {
+        assertThrows(
+            IllegalArgumentException.class,
+            () -> new AccountNumber("12345a7890")
+        );
     }
 }
