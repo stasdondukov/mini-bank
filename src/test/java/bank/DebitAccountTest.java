@@ -19,17 +19,21 @@ public class DebitAccountTest {
     }
 
     @Test
-    void zeroDepositDoesNotChangeBalance() {
+    void zeroDepositThrowsException() {
         DebitAccount account = new DebitAccount("0000000101", "Иван", 1000.0);
-        account.deposit(0.0);
-        assertEquals(1000.0, account.getBalance());
+        assertThrows(
+            IllegalArgumentException.class,
+            () -> account.deposit(0.0)
+        );
     }
 
     @Test
-    void negativeDepositDoesNotChangeBalance() {
+    void negativeDepositThrowsException() {
         DebitAccount account = new DebitAccount("0000000101", "Иван", 1000.0);
-        account.deposit(-200.0);
-        assertEquals(1000.0, account.getBalance());
+        assertThrows(
+            IllegalArgumentException.class,
+            () -> account.deposit(-200.0)
+        );
     }
 
     @Test
@@ -64,4 +68,5 @@ public class DebitAccountTest {
         assertEquals(5000.0, account.getBalance());
     }
 }
+
 
