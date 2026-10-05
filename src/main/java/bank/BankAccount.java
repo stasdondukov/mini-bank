@@ -20,7 +20,7 @@ public abstract class BankAccount {
 
     public void deposit(double amount) {
         if (amount <= 0) {
-            throw new IllegalArgumentException("Amount must be positive");
+            throw new InvalidAmountException("Amount must be positive");
         }
         this.balance += amount;
     }
