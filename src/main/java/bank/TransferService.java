@@ -18,7 +18,13 @@ public class TransferService {
         try {
             from.withdraw(total);
             to.deposit(amount);
-            notificationService.notify("Transfer " + amount + " completed");
+            
+            try {
+                notificationService.notify("Transfer " + amount + " completed");
+            } catch (Exception e) {
+                System.err.println("Notification failed: " + e.getMessage());
+            }
+            
             return true;
         } catch (InsufficientFundsException | IllegalArgumentException | InvalidAmountException e) {
             return false;
