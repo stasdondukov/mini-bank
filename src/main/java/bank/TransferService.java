@@ -10,19 +10,18 @@ public class TransferService {
     }
 
     public boolean transfer(BankAccount from, BankAccount to, double amount) {
-        if (amount <= 0) {
-            return false;
-        }
-        if (from == to) {
+        if (amount <= 0 || from == to) {
             return false;
         }
         double commission = commissionPolicy.calculate(amount);
         double total = amount + commission;
-        if (from.withdraw(total)) {
+        try {
+            from.withdraw(total);
             to.deposit(amount);
             notificationService.notify("Transfer " + amount + " completed");
             return true;
+        } catch (InsufficientFundsException | IllegalArgumentException | InvalidAmountException e) {
+            return false;
         }
-        return false;
     }
 }
