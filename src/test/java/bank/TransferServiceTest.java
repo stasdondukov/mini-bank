@@ -19,63 +19,68 @@ public class TransferServiceTest {
     }
 
     @Test
-    void failedTransferDoesNotChangeAnyBalance() {
+    void transferWithoutEnoughMoneyThrowsException() {
         BankAccount from = new DebitAccount("0000000001", "A", 1000.0);
         BankAccount to = new DebitAccount("0000000002", "B", 2000.0);
         FakeNotificationService notificationService = new FakeNotificationService();
         TransferService service = new TransferService(new NoCommission(), notificationService);
 
-        assertThrows(InsufficientFundsException.class, () -> service.transfer(from, to, 3000.0));
+        InsufficientFundsException ex = assertThrows(InsufficientFundsException.class, () -> service.transfer(from, to, 3000.0));
+        assertEquals("Insufficient funds", ex.getMessage());
 
         assertEquals(1000.0, from.getBalance());
         assertEquals(2000.0, to.getBalance());
     }
 
     @Test
-    void cannotTransferNegativeAmount() {
+    void negativeTransferThrowsException() {
         BankAccount from = new DebitAccount("0000000001", "A", 10000.0);
         BankAccount to = new DebitAccount("0000000002", "B", 2000.0);
         FakeNotificationService notificationService = new FakeNotificationService();
         TransferService service = new TransferService(new NoCommission(), notificationService);
 
-        assertThrows(InvalidAmountException.class, () -> service.transfer(from, to, -500.0));
+        InvalidAmountException ex = assertThrows(InvalidAmountException.class, () -> service.transfer(from, to, -500.0));
+        assertEquals("Transfer amount must be positive", ex.getMessage());
 
         assertEquals(10000.0, from.getBalance());
         assertEquals(2000.0, to.getBalance());
     }
 
     @Test
-    void cannotTransferZeroAmount() {
+    void zeroTransferThrowsException() {
         BankAccount from = new DebitAccount("0000000001", "A", 10000.0);
         BankAccount to = new DebitAccount("0000000002", "B", 2000.0);
         FakeNotificationService notificationService = new FakeNotificationService();
         TransferService service = new TransferService(new NoCommission(), notificationService);
 
-        assertThrows(InvalidAmountException.class, () -> service.transfer(from, to, 0.0));
+        InvalidAmountException ex = assertThrows(InvalidAmountException.class, () -> service.transfer(from, to, 0.0));
+        assertEquals("Transfer amount must be positive", ex.getMessage());
 
         assertEquals(10000.0, from.getBalance());
         assertEquals(2000.0, to.getBalance());
     }
 
     @Test
-    void cannotTransferToSameAccount() {
+    void transferToSameAccountThrowsException() {
         BankAccount account = new DebitAccount("0000000001", "A", 10000.0);
         FakeNotificationService notificationService = new FakeNotificationService();
         TransferService service = new TransferService(new NoCommission(), notificationService);
 
-        assertThrows(IllegalArgumentException.class, () -> service.transfer(account, account, 3000.0));
+        IllegalArgumentException ex = assertThrows(IllegalArgumentException.class, () -> service.transfer(account, account, 3000.0));
+        assertEquals("Cannot transfer to the same account", ex.getMessage());
 
         assertEquals(10000.0, account.getBalance());
     }
     
     @Test
-    void transferExceedingLimitFails() {
+    void transferOverLimitThrowsException() {
         BankAccount from = new DebitAccount("0000000001", "A", 100000.0);
         BankAccount to = new DebitAccount("0000000002", "B", 2000.0);
         FakeNotificationService notificationService = new FakeNotificationService();
         TransferService service = new TransferService(new NoCommission(), notificationService);
 
-        assertThrows(TransferLimitExceededException.class, () -> service.transfer(from, to, 50001.0));
+        TransferLimitExceededException ex = assertThrows(TransferLimitExceededException.class, () -> service.transfer(from, to, 50001.0));
+        assertEquals("Transfer limit exceeded", ex.getMessage());
 
         assertEquals(100000.0, from.getBalance());
         assertEquals(2000.0, to.getBalance());
@@ -208,3 +213,4 @@ public class TransferServiceTest {
         assertEquals("Transfer 5000.0 completed", notificationService.getLastMessage());
     }
 }
+
