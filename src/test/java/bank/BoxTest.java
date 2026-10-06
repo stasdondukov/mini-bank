@@ -6,20 +6,18 @@ import static org.junit.jupiter.api.Assertions.*;
 public class BoxTest {
 
     @Test
-    void validCastSucceeds() {
-        Box box = new Box();
+    void stringBoxWorksWithoutCast() {
+        Box<String> box = new Box<>();
         box.set("Java");
-        String value = (String) box.get();
-        assertEquals("Java", value);
+        String s = box.get();
+        assertEquals("Java", s);
     }
 
     @Test
-    void invalidCastThrowsClassCastException() {
-        Box box = new Box();
-        box.set(123);
-        
-        assertThrows(ClassCastException.class, () -> {
-            String value = (String) box.get();
-        });
+    void integerBoxWorksWithoutCast() {
+        Box<Integer> box = new Box<>();
+        box.set(42);
+        Integer n = box.get();
+        assertEquals(42, n);
     }
 }
