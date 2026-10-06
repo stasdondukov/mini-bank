@@ -32,7 +32,12 @@ public class TransferServiceTest {
         assertEquals(2000.0, to.getBalance());
     }
 
-    @Test
+
+ 
+ 
+ 
+ 
+@Test
     void negativeTransferThrowsException() {
         BankAccount from = new DebitAccount("0000000001", "A", 10000.0);
         BankAccount to = new DebitAccount("0000000002", "B", 2000.0);
@@ -212,5 +217,20 @@ public class TransferServiceTest {
 
         assertEquals("Transfer 5000.0 completed", notificationService.getLastMessage());
     }
-}
 
+    @Test
+    void failedTransferDoesNotChangeBalances() {
+        BankAccount from = new DebitAccount("0000000001", "A", 1000.0);
+        BankAccount to = new DebitAccount("0000000002", "B", 2000.0);
+        FakeNotificationService notificationService = new FakeNotificationService();
+        TransferService service = new TransferService(new NoCommission(), notificationService);
+
+        assertThrows(
+            InsufficientFundsException.class,
+            () -> service.transfer(from, to, 5000.0)
+        );
+
+        assertEquals(1000.0, from.getBalance());
+        assertEquals(2000.0, to.getBalance());
+    }
+}
