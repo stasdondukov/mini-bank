@@ -1,6 +1,6 @@
 package bank;
 
-public abstract class BankAccount {
+public abstract class BankAccount implements Identifiable<AccountNumber> {
     private final AccountNumber number;
     private final String owner;
     private double balance;
@@ -76,5 +76,10 @@ public abstract class BankAccount {
                 ", owner='" + owner + '\'' +
                 ", balance=" + balance +
                 '}';
+    }
+
+    @Override
+    public AccountNumber getId() {
+        return number;
     }
 }
