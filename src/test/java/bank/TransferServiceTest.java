@@ -12,9 +12,8 @@ public class TransferServiceTest {
         FakeNotificationService notificationService = new FakeNotificationService();
         TransferService service = new TransferService(new NoCommission(), notificationService);
 
-        boolean result = service.transfer(from, to, 3000.0);
+        service.transfer(from, to, 3000.0);
 
-        assertTrue(result);
         assertEquals(7000.0, from.getBalance());
         assertEquals(5000.0, to.getBalance());
     }
@@ -26,9 +25,8 @@ public class TransferServiceTest {
         FakeNotificationService notificationService = new FakeNotificationService();
         TransferService service = new TransferService(new NoCommission(), notificationService);
 
-        boolean result = service.transfer(from, to, 3000.0);
+        assertThrows(InsufficientFundsException.class, () -> service.transfer(from, to, 3000.0));
 
-        assertFalse(result);
         assertEquals(1000.0, from.getBalance());
         assertEquals(2000.0, to.getBalance());
     }
@@ -40,9 +38,8 @@ public class TransferServiceTest {
         FakeNotificationService notificationService = new FakeNotificationService();
         TransferService service = new TransferService(new NoCommission(), notificationService);
 
-        boolean result = service.transfer(from, to, -500.0);
+        assertThrows(InvalidAmountException.class, () -> service.transfer(from, to, -500.0));
 
-        assertFalse(result);
         assertEquals(10000.0, from.getBalance());
         assertEquals(2000.0, to.getBalance());
     }
@@ -54,9 +51,8 @@ public class TransferServiceTest {
         FakeNotificationService notificationService = new FakeNotificationService();
         TransferService service = new TransferService(new NoCommission(), notificationService);
 
-        boolean result = service.transfer(from, to, 0.0);
+        assertThrows(InvalidAmountException.class, () -> service.transfer(from, to, 0.0));
 
-        assertFalse(result);
         assertEquals(10000.0, from.getBalance());
         assertEquals(2000.0, to.getBalance());
     }
@@ -67,10 +63,22 @@ public class TransferServiceTest {
         FakeNotificationService notificationService = new FakeNotificationService();
         TransferService service = new TransferService(new NoCommission(), notificationService);
 
-        boolean result = service.transfer(account, account, 3000.0);
+        assertThrows(IllegalArgumentException.class, () -> service.transfer(account, account, 3000.0));
 
-        assertFalse(result);
         assertEquals(10000.0, account.getBalance());
+    }
+    
+    @Test
+    void transferExceedingLimitFails() {
+        BankAccount from = new DebitAccount("0000000001", "A", 100000.0);
+        BankAccount to = new DebitAccount("0000000002", "B", 2000.0);
+        FakeNotificationService notificationService = new FakeNotificationService();
+        TransferService service = new TransferService(new NoCommission(), notificationService);
+
+        assertThrows(TransferLimitExceededException.class, () -> service.transfer(from, to, 50001.0));
+
+        assertEquals(100000.0, from.getBalance());
+        assertEquals(2000.0, to.getBalance());
     }
 
     @Test
@@ -80,9 +88,8 @@ public class TransferServiceTest {
         FakeNotificationService notificationService = new FakeNotificationService();
         TransferService service = new TransferService(new PercentCommission(1.0), notificationService);
 
-        boolean result = service.transfer(from, to, 10000.0);
+        service.transfer(from, to, 10000.0);
 
-        assertTrue(result);
         assertEquals(900.0, from.getBalance());
     }
 
@@ -93,9 +100,8 @@ public class TransferServiceTest {
         FakeNotificationService notificationService = new FakeNotificationService();
         TransferService service = new TransferService(new PercentCommission(1.0), notificationService);
 
-        boolean result = service.transfer(from, to, 10000.0);
+        service.transfer(from, to, 10000.0);
 
-        assertTrue(result);
         assertEquals(12000.0, to.getBalance());
     }
 
@@ -106,9 +112,8 @@ public class TransferServiceTest {
         FakeNotificationService notificationService = new FakeNotificationService();
         TransferService service = new TransferService(new PercentCommission(1.0), notificationService);
 
-        boolean result = service.transfer(from, to, 10000.0);
+        assertThrows(InsufficientFundsException.class, () -> service.transfer(from, to, 10000.0));
 
-        assertFalse(result);
         assertEquals(10000.0, from.getBalance());
         assertEquals(2000.0, to.getBalance());
     }
@@ -120,9 +125,8 @@ public class TransferServiceTest {
         FakeNotificationService notificationService = new FakeNotificationService();
         TransferService service = new TransferService(new NoCommission(), notificationService);
 
-        boolean result = service.transfer(from, to, 2000.0);
+        service.transfer(from, to, 2000.0);
 
-        assertTrue(result);
         assertEquals(3000.0, from.getBalance());
         assertEquals(3000.0, to.getBalance());
     }
@@ -134,9 +138,8 @@ public class TransferServiceTest {
         FakeNotificationService notificationService = new FakeNotificationService();
         TransferService service = new TransferService(new NoCommission(), notificationService);
 
-        boolean result = service.transfer(from, to, 2000.0);
+        service.transfer(from, to, 2000.0);
 
-        assertTrue(result);
         assertEquals(3000.0, from.getBalance());
         assertEquals(4000.0, to.getBalance());
     }
@@ -148,9 +151,8 @@ public class TransferServiceTest {
         FakeNotificationService notificationService = new FakeNotificationService();
         TransferService service = new TransferService(new NoCommission(), notificationService);
 
-        boolean result = service.transfer(from, to, 2000.0);
+        service.transfer(from, to, 2000.0);
 
-        assertTrue(result);
         assertEquals(-1500.0, from.getBalance());
         assertEquals(3000.0, to.getBalance());
     }
@@ -162,9 +164,8 @@ public class TransferServiceTest {
         FakeNotificationService notificationService = new FakeNotificationService();
         TransferService service = new TransferService(new NoCommission(), notificationService);
 
-        boolean result = service.transfer(from, to, 3000.0);
+        service.transfer(from, to, 3000.0);
 
-        assertTrue(result);
         assertEquals(2000.0, from.getBalance());
         assertEquals(4000.0, to.getBalance());
     }
@@ -176,9 +177,8 @@ public class TransferServiceTest {
         FakeNotificationService notificationService = new FakeNotificationService();
         TransferService service = new TransferService(new NoCommission(), notificationService);
 
-        boolean result = service.transfer(from, to, 3000.0);
+        service.transfer(from, to, 3000.0);
 
-        assertTrue(result);
         assertEquals(1, notificationService.getNotificationCount());
         assertEquals("Transfer 3000.0 completed", notificationService.getLastMessage());
     }
@@ -190,9 +190,8 @@ public class TransferServiceTest {
         FakeNotificationService notificationService = new FakeNotificationService();
         TransferService service = new TransferService(new NoCommission(), notificationService);
 
-        boolean result = service.transfer(from, to, 3000.0);
+        assertThrows(InsufficientFundsException.class, () -> service.transfer(from, to, 3000.0));
 
-        assertFalse(result);
         assertEquals(0, notificationService.getNotificationCount());
         assertNull(notificationService.getLastMessage());
     }
@@ -204,10 +203,8 @@ public class TransferServiceTest {
         FakeNotificationService notificationService = new FakeNotificationService();
         TransferService service = new TransferService(new PercentCommission(2.0), notificationService);
 
-        boolean result = service.transfer(from, to, 5000.0);
+        service.transfer(from, to, 5000.0);
 
-        assertTrue(result);
         assertEquals("Transfer 5000.0 completed", notificationService.getLastMessage());
     }
 }
-
