@@ -48,4 +48,41 @@ public class AccountUtilsTest {
         AccountUtils.addDemoDebitAccounts(list);
         assertEquals(3, list.size());
     }
+
+    @Test
+    void testRichestWithEmptyList() {
+        java.util.List<DebitAccount> empty = new java.util.ArrayList<>();
+        org.junit.jupiter.api.Assertions.assertThrows(IllegalArgumentException.class, () -> AccountUtils.richest(empty));
+    }
+
+    @Test
+    void testRichestWithSingleElement() {
+        java.util.List<DebitAccount> accounts = java.util.List.of(
+            new DebitAccount("1111111111", "Ivan", 100.0)
+        );
+        DebitAccount richest = AccountUtils.richest(accounts);
+        assertEquals("1111111111", richest.getNumber().value());
+    }
+
+    @Test
+    void testRichestWithMultipleElements() {
+        java.util.List<DebitAccount> accounts = java.util.List.of(
+            new DebitAccount("1111111111", "Ivan", 100.0),
+            new DebitAccount("2222222222", "Olga", 300.0),
+            new DebitAccount("3333333333", "Petr", 200.0)
+        );
+        DebitAccount richest = AccountUtils.richest(accounts);
+        assertEquals("2222222222", richest.getNumber().value());
+    }
+
+    @Test
+    void testRichestWithSameMaxBalance() {
+        java.util.List<DebitAccount> accounts = java.util.List.of(
+            new DebitAccount("1111111111", "Ivan", 300.0),
+            new DebitAccount("2222222222", "Olga", 300.0),
+            new DebitAccount("3333333333", "Petr", 200.0)
+        );
+        DebitAccount richest = AccountUtils.richest(accounts);
+        assertEquals("1111111111", richest.getNumber().value());
+    }
 }

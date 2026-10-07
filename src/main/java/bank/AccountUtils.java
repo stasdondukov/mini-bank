@@ -19,4 +19,20 @@ public class AccountUtils {
         target.add(new DebitAccount("2222222222", "Demo2", 2000.0));
 
     }
+
+    public static <T extends BankAccount> T richest(List<T> accounts) {
+        if (accounts == null || accounts.isEmpty()) {
+            throw new IllegalArgumentException("List of accounts cannot be null or empty");
+        }
+        
+        T richestAccount = accounts.get(0);
+        for (int i = 1; i < accounts.size(); i++) {
+            T current = accounts.get(i);
+            if (current.getBalance() > richestAccount.getBalance()) {
+                richestAccount = current;
+            }
+        }
+        
+        return richestAccount;
+    }
 }
