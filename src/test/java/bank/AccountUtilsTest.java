@@ -25,4 +25,27 @@ public class AccountUtilsTest {
         
         assertEquals(600.0, AccountUtils.totalBalance(mixedAccounts));
     }
+
+    @Test
+    void testAddDemoDebitAccountsToDebitList() {
+        java.util.List<DebitAccount> list = new java.util.ArrayList<>();
+        AccountUtils.addDemoDebitAccounts(list);
+        assertEquals(2, list.size());
+    }
+
+    @Test
+    void testAddDemoDebitAccountsToBankList() {
+        java.util.List<BankAccount> list = new java.util.ArrayList<>();
+        list.add(new SavingsAccount("0000000000", "Existing", 100.0, 10.0));
+        AccountUtils.addDemoDebitAccounts(list);
+        assertEquals(3, list.size());
+    }
+
+    @Test
+    void testAddDemoDebitAccountsToObjectList() {
+        java.util.List<Object> list = new java.util.ArrayList<>();
+        list.add("String Element");
+        AccountUtils.addDemoDebitAccounts(list);
+        assertEquals(3, list.size());
+    }
 }
