@@ -6,7 +6,10 @@ public class Main {
         CommissionPolicy commissionPolicy = new NoCommission();
         NotificationService notificationService = new ConsoleNotificationService();
         BlockedAccountRegistry blockedAccounts = new BlockedAccountRegistry();
-        TransferService transferService = new TransferService(commissionPolicy, notificationService, blockedAccounts);
+        TransactionJournal journal = new TransactionJournal();
+        TransferService transferService = new TransferService(
+            commissionPolicy, notificationService, blockedAccounts, journal
+        );
 
         BankAccount from = new DebitAccount(new AccountNumber("1234567890"), "Ivan", 1000.0);
         BankAccount to = new DebitAccount(new AccountNumber("0987654321"), "Olga", 2000.0);
