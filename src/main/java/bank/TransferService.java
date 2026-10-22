@@ -4,12 +4,14 @@ public class TransferService {
     private final CommissionPolicy commissionPolicy;
     private final NotificationService notificationService;
     private final BlockedAccountRegistry blockedAccounts;
+    private final TransactionJournal journal;
 
     public TransferService(CommissionPolicy commissionPolicy, NotificationService notificationService,
-                           BlockedAccountRegistry blockedAccounts) {
+                           BlockedAccountRegistry blockedAccounts, TransactionJournal journal) {
         this.commissionPolicy = commissionPolicy;
         this.notificationService = notificationService;
         this.blockedAccounts = blockedAccounts;
+        this.journal = journal;
     }
 
     public void transfer(BankAccount from, BankAccount to, double amount) {
@@ -30,6 +32,13 @@ public class TransferService {
         
         from.withdraw(total);
         to.deposit(amount);
+        journal.add(new Transaction(
+            journal.size() + 1L,
+            TransactionType.TRANSFER,
+            from.getNumber(),
+            amount,
+            TransactionStatus.SUCCESS
+        ));
         notificationService.notify("Transfer " + amount + " completed");
     }
 }
