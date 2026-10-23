@@ -13,6 +13,12 @@ public class TransactionJournalTest {
     private final Transaction tx2 = new Transaction(
         2L, TransactionType.TRANSFER, new AccountNumber("0000000002"), 200.0, TransactionStatus.SUCCESS
     );
+    private final Transaction rejected1 = new Transaction(
+        3L, TransactionType.TRANSFER, new AccountNumber("0000000001"), 300.0, TransactionStatus.REJECTED
+    );
+    private final Transaction rejected2 = new Transaction(
+        4L, TransactionType.TRANSFER, new AccountNumber("0000000002"), 400.0, TransactionStatus.REJECTED
+    );
 
     @Test
     void transactionsKeepInsertionOrder() {
@@ -57,5 +63,57 @@ public class TransactionJournalTest {
 
         assertEquals(1, journal.size());
         assertSame(tx1, journal.findAll().get(0));
+    }
+
+    @Test
+    void removeRejectedKeepsSuccessOrderAndDuplicates() {
+        TransactionJournal journal = new TransactionJournal();
+        journal.add(rejected1);
+        journal.add(tx2);
+        journal.add(rejected1);
+        journal.add(rejected2);
+        journal.add(tx1);
+        journal.add(tx1);
+        journal.add(rejected2);
+
+        journal.removeRejected();
+
+        assertEquals(3, journal.size());
+        assertEquals(List.of(tx2, tx1, tx1), journal.findAll());
+    }
+
+    @Test
+    void removeRejectedRemovesAllRejectedTransactions() {
+        TransactionJournal journal = new TransactionJournal();
+        journal.add(rejected1);
+        journal.add(rejected1);
+        journal.add(rejected2);
+
+        journal.removeRejected();
+
+        assertEquals(0, journal.size());
+        assertTrue(journal.findAll().isEmpty());
+    }
+
+    @Test
+    void removeRejectedKeepsSuccessfulTransactions() {
+        TransactionJournal journal = new TransactionJournal();
+        journal.add(tx2);
+        journal.add(tx1);
+
+        journal.removeRejected();
+
+        assertEquals(2, journal.size());
+        assertEquals(List.of(tx2, tx1), journal.findAll());
+    }
+
+    @Test
+    void removeRejectedWorksForEmptyJournal() {
+        TransactionJournal journal = new TransactionJournal();
+
+        journal.removeRejected();
+
+        assertEquals(0, journal.size());
+        assertTrue(journal.findAll().isEmpty());
     }
 }
