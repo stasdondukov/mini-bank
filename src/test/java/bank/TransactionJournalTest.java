@@ -169,4 +169,45 @@ public class TransactionJournalTest {
 
         assertEquals(List.of(tx1), journal.findByAccount(new AccountNumber("0000000001")));
     }
+
+    @Test
+    void addingTransactionUpdatesJournalAndIndex() {
+        TransactionJournal journal = new TransactionJournal();
+
+        journal.add(tx1);
+
+        assertEquals(List.of(tx1), journal.findAll());
+        assertEquals(List.of(tx1), journal.findByAccount(new AccountNumber("0000000001")));
+    }
+
+    @Test
+    void removingRejectedKeepsJournalAndIndexConsistent() {
+        TransactionJournal journal = new TransactionJournal();
+        journal.add(rejected1);
+        journal.add(tx1);
+        journal.add(rejected1);
+        journal.add(rejected2);
+        journal.add(tx1);
+
+        journal.removeRejected();
+
+        assertEquals(List.of(tx1, tx1), journal.findAll());
+        assertEquals(List.of(tx1, tx1), journal.findByAccount(tx1.account()));
+        assertTrue(journal.findByAccount(rejected2.account()).isEmpty());
+
+        journal.add(tx2);
+        assertEquals(List.of(tx1, tx1, tx2), journal.findAll());
+        assertEquals(List.of(tx2), journal.findByAccount(tx2.account()));
+    }
+
+    @Test
+    void nullTransactionDoesNotChangeJournalOrIndex() {
+        TransactionJournal journal = new TransactionJournal();
+        journal.add(tx1);
+
+        assertThrows(IllegalArgumentException.class, () -> journal.add(null));
+
+        assertEquals(List.of(tx1), journal.findAll());
+        assertEquals(List.of(tx1), journal.findByAccount(tx1.account()));
+    }
 }
