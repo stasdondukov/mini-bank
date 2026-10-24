@@ -116,4 +116,57 @@ public class TransactionJournalTest {
         assertEquals(0, journal.size());
         assertTrue(journal.findAll().isEmpty());
     }
+
+    @Test
+    void findByAccountKeepsMatchingOrderAndDuplicates() {
+        TransactionJournal journal = new TransactionJournal();
+        journal.add(tx2);
+        journal.add(rejected1);
+        journal.add(tx1);
+        journal.add(rejected2);
+        journal.add(tx1);
+
+        List<Transaction> result = journal.findByAccount(new AccountNumber("0000000001"));
+
+        assertEquals(List.of(rejected1, tx1, tx1), result);
+    }
+
+    @Test
+    void findByAccountReturnsEmptyListWhenNothingMatches() {
+        TransactionJournal journal = new TransactionJournal();
+        AccountNumber number = new AccountNumber("0000000003");
+        assertTrue(journal.findByAccount(number).isEmpty());
+
+        journal.add(tx1);
+        journal.add(tx2);
+
+        assertTrue(journal.findByAccount(number).isEmpty());
+    }
+
+    @Test
+    void findByAccountReturnsIndependentList() {
+        TransactionJournal journal = new TransactionJournal();
+        journal.add(tx1);
+        journal.add(tx2);
+        AccountNumber number = new AccountNumber("0000000001");
+
+        List<Transaction> result = journal.findByAccount(number);
+        result.clear();
+        result.add(rejected2);
+
+        assertEquals(List.of(tx1, tx2), journal.findAll());
+        assertEquals(List.of(tx1), journal.findByAccount(number));
+    }
+
+    @Test
+    void findByAccountReflectsRejectedRemoval() {
+        TransactionJournal journal = new TransactionJournal();
+        journal.add(tx1);
+        journal.add(rejected1);
+        journal.add(tx2);
+
+        journal.removeRejected();
+
+        assertEquals(List.of(tx1), journal.findByAccount(new AccountNumber("0000000001")));
+    }
 }
