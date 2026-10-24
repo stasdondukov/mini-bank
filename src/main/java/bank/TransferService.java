@@ -30,8 +30,16 @@ public class TransferService {
         double commission = commissionPolicy.calculate(amount);
         double total = amount + commission;
         
-        from.withdraw(total);
-        to.deposit(amount);
+        double fromBalance = from.getBalance();
+        double toBalance = to.getBalance();
+        try {
+            from.withdraw(total);
+            to.deposit(amount);
+        } catch (RuntimeException e) {
+            from.setBalance(fromBalance);
+            to.setBalance(toBalance);
+            throw e;
+        }
         journal.add(new Transaction(
             journal.size() + 1L,
             TransactionType.TRANSFER,
