@@ -3,12 +3,12 @@ package bank;
 public class Main {
 
     public static void main(String[] args) {
-        CommissionPolicy commissionPolicy = new NoCommission();
-        NotificationService notificationService = new ConsoleNotificationService();
+        CommissionPolicy noCommission = amount -> 0.0;
+        NotificationService console = System.out::println;
         BlockedAccountRegistry blockedAccounts = new BlockedAccountRegistry();
         TransactionJournal journal = new TransactionJournal();
         TransferService transferService = new TransferService(
-            commissionPolicy, notificationService, blockedAccounts, journal
+            noCommission, console, blockedAccounts, journal
         );
 
         BankService bank = new BankService(new InMemoryRepository<>(), transferService);
