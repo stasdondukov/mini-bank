@@ -2,11 +2,52 @@ package bank;
 
 import org.junit.jupiter.api.Test;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 public class TransferServiceTest {
+
+    @Test
+    void transferWithoutCommissionUsesLambdaNotification() {
+        BankAccount from = new DebitAccount("0000000001", "A", 5000.0);
+        BankAccount to = new DebitAccount("0000000002", "B", 1000.0);
+        List<String> messages = new ArrayList<>();
+        CommissionPolicy noCommission = amount -> 0.0;
+        NotificationService notification = message -> messages.add(message);
+        TransactionJournal journal = new TransactionJournal();
+        TransferService service = new TransferService(
+            noCommission, notification, new BlockedAccountRegistry(), journal
+        );
+
+        service.transfer(from, to, 2000.0);
+
+        assertEquals(3000.0, from.getBalance());
+        assertEquals(3000.0, to.getBalance());
+        assertEquals(List.of("Transfer 2000.0 completed"), messages);
+        assertEquals(1, journal.size());
+    }
+
+    @Test
+    void transferWithOnePercentCommissionUsesMethodReferenceNotification() {
+        BankAccount from = new DebitAccount("0000000001", "A", 5000.0);
+        BankAccount to = new DebitAccount("0000000002", "B", 1000.0);
+        List<String> messages = new ArrayList<>();
+        CommissionPolicy onePercent = amount -> amount * 0.01;
+        NotificationService notification = messages::add;
+        TransactionJournal journal = new TransactionJournal();
+        TransferService service = new TransferService(
+            onePercent, notification, new BlockedAccountRegistry(), journal
+        );
+
+        service.transfer(from, to, 2000.0);
+
+        assertEquals(2980.0, from.getBalance());
+        assertEquals(3000.0, to.getBalance());
+        assertEquals(List.of("Transfer 2000.0 completed"), messages);
+        assertEquals(1, journal.size());
+    }
 
     @Test
     void successfulTransferIsRecordedInJournal() {
