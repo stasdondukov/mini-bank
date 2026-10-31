@@ -3,6 +3,9 @@ package bank;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.util.List;
+import java.util.function.Predicate;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 public class BankServiceTest {
@@ -37,6 +40,47 @@ public class BankServiceTest {
 
         assertSame(account, bankService.findAccount(new AccountNumber("0000000001")));
         assertSame(account, accounts.findById(number));
+    }
+
+    @Test
+    void findsAccountsMatchingBalanceAndTypeConditions() {
+        BankAccount empty = new DebitAccount("3333333333", "Anna", 0);
+        BankAccount rich = new CreditAccount("4444444444", "Olga", 100_000, 1000);
+        bankService.openAccount(from);
+        bankService.openAccount(empty);
+        bankService.openAccount(rich);
+
+        List<BankAccount> positive = bankService.findAccounts(account -> account.getBalance() > 0);
+        assertEquals(2, positive.size());
+        assertTrue(positive.containsAll(List.of(from, rich)));
+        assertEquals(List.of(rich), bankService.findAccounts(account -> account.getBalance() >= 100_000));
+        List<BankAccount> debit = bankService.findAccounts(DebitAccount.class::isInstance);
+        assertEquals(2, debit.size());
+        assertTrue(debit.containsAll(List.of(from, empty)));
+    }
+
+    @Test
+    void changingFilteredListDoesNotChangeBankAccounts() {
+        bankService.openAccount(from);
+        bankService.openAccount(to);
+        Predicate<Object> all = value -> true;
+        List<BankAccount> result = bankService.findAccounts(all);
+
+        result.clear();
+        result.add(new DebitAccount("3333333333", "Anna", 1000));
+
+        assertEquals(2, accounts.size());
+        assertSame(from, bankService.findAccount(from.getNumber()));
+        assertSame(to, bankService.findAccount(to.getNumber()));
+        assertNull(bankService.findAccount(new AccountNumber("3333333333")));
+        assertEquals(2, bankService.findAccounts(all).size());
+    }
+
+    @Test
+    void findsNoAccountsInEmptyBankOrWhenNothingMatches() {
+        assertTrue(bankService.findAccounts(account -> true).isEmpty());
+        bankService.openAccount(from);
+        assertTrue(bankService.findAccounts(account -> account.getBalance() >= 100_000).isEmpty());
     }
 
     @Test
