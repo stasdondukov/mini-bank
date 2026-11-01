@@ -38,5 +38,28 @@ public class AccountSortingDemo {
         List<BankAccount> third = new ArrayList<>(accounts);
         third.sort(byBalance);
         System.out.println("Comparator.comparingDouble: " + third);
+
+        TransferService transfers = new TransferService(
+            amount -> 0.0, System.out::println,
+            new BlockedAccountRegistry(), new TransactionJournal()
+        );
+        BankService bank = new BankService(new InMemoryRepository<>(), transfers);
+        for (BankAccount account : accounts) {
+            bank.openAccount(account);
+        }
+        bank.openAccount(new CreditAccount("5555555555", "Maria", 2000, 1000));
+        bank.openAccount(new CreditAccount("6666666666", "Oleg", 500, 1000));
+        bank.openAccount(new SavingsAccount("7777777777", "Elena", 4000, 1000));
+
+        Comparator<BankAccount> byBalanceDesc = byBalance.reversed();
+        Comparator<BankAccount> byNumber = Comparator.comparing(a -> a.getId().value());
+        Comparator<BankAccount> byTypeThenBalance = Comparator
+            .comparing((BankAccount a) -> a.getClass().getSimpleName())
+            .thenComparingDouble(BankAccount::getBalance);
+
+        System.out.println("Balance ascending: " + bank.sortedAccounts(byBalance));
+        System.out.println("Balance descending: " + bank.sortedAccounts(byBalanceDesc));
+        System.out.println("Account number: " + bank.sortedAccounts(byNumber));
+        System.out.println("Account type, then balance: " + bank.sortedAccounts(byTypeThenBalance));
     }
 }
