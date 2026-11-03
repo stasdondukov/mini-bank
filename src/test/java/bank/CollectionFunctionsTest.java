@@ -4,6 +4,7 @@ import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
@@ -14,6 +15,50 @@ public class CollectionFunctionsTest {
     private final BankAccount positive = new DebitAccount("2222222222", "Olga", 500);
     private final BankAccount rich = new CreditAccount("3333333333", "Petr", 100_000, 1000);
     private final List<BankAccount> accounts = List.of(empty, positive, rich);
+
+    @Test
+    void forEachCallsLambdaForEverySummaryInOrderIncludingDuplicates() {
+        AccountSummary first = new AccountSummary(empty.getId(), "DebitAccount", 0);
+        AccountSummary second = new AccountSummary(rich.getId(), "CreditAccount", 100_000);
+        List<AccountSummary> source = new ArrayList<>(List.of(first, second, first));
+        List<AccountSummary> visited = new ArrayList<>();
+        Consumer<AccountSummary> action = summary -> visited.add(summary);
+
+        CollectionFunctions.forEach(source, action);
+
+        assertEquals(List.of(first, second, first), visited);
+        assertEquals(List.of(first, second, first), source);
+    }
+
+    @Test
+    void forEachAcceptsMethodReference() {
+        AccountSummary summary = new AccountSummary(positive.getId(), "DebitAccount", 500);
+        List<AccountSummary> visited = new ArrayList<>();
+
+        CollectionFunctions.forEach(List.of(summary), visited::add);
+
+        assertEquals(List.of(summary), visited);
+    }
+
+    @Test
+    void forEachDoesNotCallActionForEmptyList() {
+        Consumer<AccountSummary> action = summary -> {
+            throw new AssertionError("Action must not be called for an empty list");
+        };
+
+        CollectionFunctions.forEach(List.<AccountSummary>of(), action);
+    }
+
+    @Test
+    void forEachAcceptsConsumerForSupertype() {
+        AccountSummary summary = new AccountSummary(positive.getId(), "DebitAccount", 500);
+        List<Object> visited = new ArrayList<>();
+        Consumer<Object> action = visited::add;
+
+        CollectionFunctions.forEach(List.of(summary), action);
+
+        assertEquals(List.of(summary), visited);
+    }
 
     @Test
     void mapsAccountsToSummaries() {
