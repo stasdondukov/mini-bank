@@ -2,12 +2,19 @@ package bank;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
 public final class CollectionFunctions {
 
     private CollectionFunctions() {
+    }
+
+    public static <T> void forEach(List<T> source, Consumer<? super T> action) {
+        for (T value : source) {
+            action.accept(value);
+        }
     }
 
     public static <T, R> List<R> map(List<T> source, Function<? super T, ? extends R> mapper) {

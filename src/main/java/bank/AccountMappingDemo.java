@@ -1,6 +1,7 @@
 package bank;
 
 import java.util.List;
+import java.util.function.Consumer;
 import java.util.function.Function;
 
 public class AccountMappingDemo {
@@ -19,6 +20,10 @@ public class AccountMappingDemo {
         );
         List<AccountSummary> summaries = CollectionFunctions.map(accounts, toSummary);
         System.out.println("Summaries: " + summaries);
+
+        Consumer<AccountSummary> printer = summary -> System.out.println(summary);
+        CollectionFunctions.forEach(summaries, printer);
+        CollectionFunctions.forEach(summaries, System.out::println);
 
         Function<BankAccount, String> label =
             account -> account.getId() + " : " + account.getBalance();
