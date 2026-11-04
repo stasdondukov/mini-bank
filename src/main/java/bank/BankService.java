@@ -3,6 +3,7 @@ package bank;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Objects;
 import java.util.function.Predicate;
 
 public class BankService {
@@ -27,6 +28,24 @@ public class BankService {
 
     public List<BankAccount> findAccounts(Predicate<? super BankAccount> condition) {
         return CollectionFunctions.filter(accounts.findAll(), condition);
+    }
+
+    public List<BankAccount> findRichAccounts(double minBalance) {
+        return accounts.findAll().stream()
+            .filter(account -> account.getBalance() >= minBalance)
+            .toList();
+    }
+
+    public List<BankAccount> findDebitAccounts() {
+        return accounts.findAll().stream()
+            .filter(DebitAccount.class::isInstance)
+            .toList();
+    }
+
+    public List<BankAccount> findAccountsByOwner(String owner) {
+        return accounts.findAll().stream()
+            .filter(account -> Objects.equals(account.getOwner(), owner))
+            .toList();
     }
 
     public List<BankAccount> sortedAccounts(Comparator<? super BankAccount> comparator) {
