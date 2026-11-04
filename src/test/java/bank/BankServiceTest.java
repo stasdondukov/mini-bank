@@ -4,6 +4,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
+import java.util.Map;
 import java.util.function.Predicate;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -40,6 +41,50 @@ public class BankServiceTest {
 
         assertSame(account, bankService.findAccount(new AccountNumber("0000000001")));
         assertSame(account, accounts.findById(number));
+    }
+
+    @Test
+    void summariesContainAllFieldsAndKeepRepositoryOrder() {
+        BankAccount credit = new CreditAccount("3333333333", "Olga", 5000, 1000);
+        BankAccount savings = new SavingsAccount("4444444444", "Anna", 3000, 1000);
+        bankService.openAccount(credit);
+        bankService.openAccount(from);
+        bankService.openAccount(savings);
+        List<BankAccount> before = accounts.findAll();
+        Map<AccountNumber, AccountSummary> expected = Map.of(
+            from.getId(), new AccountSummary(from.getId(), "DebitAccount", 10000),
+            credit.getId(), new AccountSummary(credit.getId(), "CreditAccount", 5000),
+            savings.getId(), new AccountSummary(savings.getId(), "SavingsAccount", 3000)
+        );
+
+        List<AccountSummary> result = bankService.getAccountSummaries();
+
+        assertEquals(3, result.size());
+        for (int i = 0; i < before.size(); i++) {
+            assertEquals(expected.get(before.get(i).getId()), result.get(i));
+        }
+        assertEquals(before, accounts.findAll());
+    }
+
+    @Test
+    void emptyBankHasNoSummaries() {
+        assertTrue(bankService.getAccountSummaries().isEmpty());
+    }
+
+    @Test
+    void summariesAreIndependentSnapshotsOfAccounts() {
+        bankService.openAccount(from);
+        List<AccountSummary> result = bankService.getAccountSummaries();
+
+        assertThrows(UnsupportedOperationException.class, () -> result.remove(0));
+        assertSame(from, bankService.findAccount(from.getId()));
+        from.deposit(500);
+
+        assertEquals(10000, result.get(0).balance());
+        assertEquals(10500, bankService.getAccountSummaries().get(0).balance());
+        bankService.closeAccount(from.getId());
+        assertEquals(1, result.size());
+        assertTrue(bankService.getAccountSummaries().isEmpty());
     }
 
     @Test
