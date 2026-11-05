@@ -7,6 +7,11 @@ import java.util.Objects;
 import java.util.function.Predicate;
 
 public class BankService {
+    private static final Comparator<BankAccount> BY_NUMBER = Comparator.comparing(
+        BankAccount::getId,
+        Comparator.nullsLast(Comparator.comparing(AccountNumber::value))
+    );
+
     private final Repository<AccountNumber, BankAccount> accounts;
     private final TransferService transferService;
 
@@ -66,6 +71,36 @@ public class BankService {
         List<BankAccount> result = new ArrayList<>(accounts.findAll());
         result.sort(comparator);
         return result;
+    }
+
+    public List<BankAccount> richestFirst() {
+        return accounts.findAll().stream()
+            .sorted(Comparator.comparingDouble(BankAccount::getBalance).reversed())
+            .toList();
+    }
+
+    public List<BankAccount> sortedByNumber() {
+        return accounts.findAll().stream()
+            .sorted(BY_NUMBER)
+            .toList();
+    }
+
+    public List<BankAccount> sortedByTypeThenBalance() {
+        Comparator<BankAccount> byTypeThenBalance = Comparator
+            .comparing((BankAccount account) -> account.getClass().getSimpleName())
+            .thenComparingDouble(BankAccount::getBalance);
+        return accounts.findAll().stream()
+            .sorted(byTypeThenBalance)
+            .toList();
+    }
+
+    public List<BankAccount> sortedByOwnerThenNumber() {
+        Comparator<BankAccount> byOwnerThenNumber = Comparator
+            .comparing(BankAccount::getOwner, Comparator.nullsLast(Comparator.naturalOrder()))
+            .thenComparing(BY_NUMBER);
+        return accounts.findAll().stream()
+            .sorted(byOwnerThenNumber)
+            .toList();
     }
 
     public boolean closeAccount(AccountNumber number) {
