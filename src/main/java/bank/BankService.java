@@ -5,6 +5,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.OptionalDouble;
 import java.util.function.Predicate;
 
 public class BankService {
@@ -46,6 +47,23 @@ public class BankService {
         return accounts.findAll().stream()
             .filter(account -> account.getBalance() >= minBalance)
             .findFirst();
+    }
+
+    public double totalBalance() {
+        return accounts.findAll().stream()
+            .mapToDouble(BankAccount::getBalance)
+            .sum();
+    }
+
+    public OptionalDouble averageBalance() {
+        return accounts.findAll().stream()
+            .mapToDouble(BankAccount::getBalance)
+            .average();
+    }
+
+    public Optional<BankAccount> richestAccount() {
+        return accounts.findAll().stream()
+            .max(Comparator.comparingDouble(BankAccount::getBalance));
     }
 
     public List<BankAccount> findDebitAccounts() {
