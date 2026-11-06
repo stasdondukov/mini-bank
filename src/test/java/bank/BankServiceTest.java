@@ -33,6 +33,26 @@ public class BankServiceTest {
     }
 
     @Test
+    void calculatesBalanceStatisticsIncludingNegativeBalance() {
+        CreditAccount credit = new CreditAccount("3333333333", "Anna", 0, 2000);
+        credit.withdraw(1000.5);
+        bankService.openAccount(credit);
+        bankService.openAccount(from);
+        bankService.openAccount(to);
+
+        assertEquals(10999.5, bankService.totalBalance());
+        assertEquals(3666.5, bankService.averageBalance().orElseThrow());
+        assertSame(from, bankService.richestAccount().orElseThrow());
+    }
+
+    @Test
+    void emptyBankHasZeroTotalAndNoAverageOrRichestAccount() {
+        assertEquals(0.0, bankService.totalBalance());
+        assertTrue(bankService.averageBalance().isEmpty());
+        assertTrue(bankService.richestAccount().isEmpty());
+    }
+
+    @Test
     void detectsOnlyBlockedAccountsPresentInTheBank() {
         bankService.openAccount(from);
         blockedAccounts.block(to.getNumber());
