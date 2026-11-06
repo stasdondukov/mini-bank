@@ -33,6 +33,49 @@ public class BankServiceTest {
     }
 
     @Test
+    void detectsOnlyBlockedAccountsPresentInTheBank() {
+        bankService.openAccount(from);
+        blockedAccounts.block(to.getNumber());
+        assertFalse(bankService.hasBlockedAccounts());
+
+        bankService.openAccount(to);
+        assertTrue(bankService.hasBlockedAccounts());
+
+        blockedAccounts.unblock(to.getNumber());
+        assertFalse(bankService.hasBlockedAccounts());
+    }
+
+    @Test
+    void zeroAndNegativeBalancesAreNotPositive() {
+        bankService.openAccount(from);
+        assertTrue(bankService.allAccountsPositive());
+
+        CreditAccount credit = new CreditAccount("3333333333", "Anna", 0, 1000);
+        bankService.openAccount(credit);
+        assertFalse(bankService.allAccountsPositive());
+
+        credit.withdraw(100);
+        assertFalse(bankService.allAccountsPositive());
+    }
+
+    @Test
+    void detectsCreditAccountsAmongOtherTypes() {
+        bankService.openAccount(from);
+        assertTrue(bankService.noCreditAccounts());
+
+        BankAccount credit = new CreditAccount("3333333333", "Anna", 100, 1000);
+        bankService.openAccount(credit);
+        assertFalse(bankService.noCreditAccounts());
+    }
+
+    @Test
+    void matchOperationsHandleEmptyBank() {
+        assertFalse(bankService.hasBlockedAccounts());
+        assertTrue(bankService.allAccountsPositive());
+        assertTrue(bankService.noCreditAccounts());
+    }
+
+    @Test
     void openedAccountCanBeFound() {
         AccountNumber number = new AccountNumber("0000000001");
         BankAccount account = new DebitAccount(number, "Ivan", 1000.0);
