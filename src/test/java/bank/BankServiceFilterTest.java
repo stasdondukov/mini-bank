@@ -38,6 +38,30 @@ public class BankServiceFilterTest {
     }
 
     @Test
+    void firstRichAccountFollowsRepositoryOrderAndIncludesBoundary() {
+        assertSame(bank.findRichAccounts(100_000).get(0),
+            bank.findFirstRichAccount(100_000).orElseThrow());
+
+        bank.closeAccount(credit.getId());
+        assertSame(richDebit, bank.findFirstRichAccount(100_000).orElseThrow());
+        assertEquals("3333333333", bank.findFirstRichAccount(100_000)
+            .map(account -> account.getId().value())
+            .orElse("not found"));
+    }
+
+    @Test
+    void noRichAccountAllowsFallbackOrException() {
+        assertTrue(bank.findFirstRichAccount(200_000).isEmpty());
+        assertEquals("not found", bank.findFirstRichAccount(200_000)
+            .map(account -> account.getId().value())
+            .orElse("not found"));
+        IllegalStateException exception = assertThrows(IllegalStateException.class,
+            () -> bank.findFirstRichAccount(200_000)
+                .orElseThrow(() -> new IllegalStateException("No rich account")));
+        assertEquals("No rich account", exception.getMessage());
+    }
+
+    @Test
     void debitAccountsExcludeOtherTypesAndKeepRepositoryOrder() {
         List<BankAccount> expected = new ArrayList<>(accounts.findAll());
         expected.removeAll(List.of(credit, savings));
@@ -62,6 +86,7 @@ public class BankServiceFilterTest {
         ));
 
         assertTrue(emptyBank.findRichAccounts(0).isEmpty());
+        assertTrue(emptyBank.findFirstRichAccount(0).isEmpty());
         assertTrue(emptyBank.findDebitAccounts().isEmpty());
         assertTrue(emptyBank.findAccountsByOwner("Ivan").isEmpty());
     }
