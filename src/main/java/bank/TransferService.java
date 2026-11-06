@@ -14,6 +14,10 @@ public class TransferService {
         this.journal = journal;
     }
 
+    boolean isAccountBlocked(AccountNumber number) {
+        return blockedAccounts.isBlocked(number);
+    }
+
     public void transfer(BankAccount from, BankAccount to, double amount) {
         if (amount <= 0) {
             throw new InvalidAmountException("Transfer amount must be positive");
@@ -24,7 +28,7 @@ public class TransferService {
         if (amount > 50000) {
             throw new TransferLimitExceededException("Transfer limit exceeded");
         }
-        if (blockedAccounts.isBlocked(from.getNumber())) {
+        if (isAccountBlocked(from.getNumber())) {
             throw new IllegalStateException("Source account is blocked");
         }
         double commission = commissionPolicy.calculate(amount);

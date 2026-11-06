@@ -2,6 +2,8 @@ package bank;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Predicate;
 
 public class AccountStreamDemo {
 
@@ -27,5 +29,15 @@ public class AccountStreamDemo {
         System.out.println("Loop: " + loopResult);
         System.out.println("Stream: " + streamResult);
         System.out.println("Equal results: " + loopResult.equals(streamResult));
+
+        AtomicInteger predicateCalls = new AtomicInteger();
+        Predicate<BankAccount> rich = account -> {
+            predicateCalls.incrementAndGet();
+            return account.getBalance() >= 100_000;
+        };
+        boolean found = accounts.stream().anyMatch(rich);
+
+        System.out.println("anyMatch result: " + found);
+        System.out.println("Predicate calls: " + predicateCalls.get() + " of " + accounts.size());
     }
 }

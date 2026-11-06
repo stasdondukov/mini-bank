@@ -53,6 +53,21 @@ public class BankService {
             .toList();
     }
 
+    public boolean hasBlockedAccounts() {
+        return accounts.findAll().stream()
+            .anyMatch(account -> transferService.isAccountBlocked(account.getNumber()));
+    }
+
+    public boolean allAccountsPositive() {
+        return accounts.findAll().stream()
+            .allMatch(account -> account.getBalance() > 0);
+    }
+
+    public boolean noCreditAccounts() {
+        return accounts.findAll().stream()
+            .noneMatch(CreditAccount.class::isInstance);
+    }
+
     public List<AccountSummary> getAccountSummaries() {
         return accounts.findAll().stream()
             .map(this::toSummary)
