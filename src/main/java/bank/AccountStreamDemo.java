@@ -56,5 +56,17 @@ public class AccountStreamDemo {
 
         System.out.println("First rich account: " + account);
         System.out.println("Account label: " + label);
+
+        double loopTotal = 0.0;
+        for (BankAccount value : accounts) {
+            loopTotal += value.getBalance();
+        }
+
+        double reducedTotal = accounts.stream()
+            .map(BankAccount::getBalance)
+            .reduce(0.0, Double::sum);
+
+        System.out.println("Loop total: " + loopTotal);
+        System.out.println("Reduce total: " + reducedTotal);
     }
 }
