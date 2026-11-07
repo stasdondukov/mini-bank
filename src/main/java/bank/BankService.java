@@ -1,161 +1,112 @@
 package bank;
 
-import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.OptionalDouble;
 import java.util.function.Predicate;
 
 public class BankService {
-    private static final Comparator<BankAccount> BY_NUMBER = Comparator.comparing(
-        BankAccount::getId,
-        Comparator.nullsLast(Comparator.comparing(AccountNumber::value))
-    );
-
-    private final Repository<AccountNumber, BankAccount> accounts;
-    private final TransferService transferService;
+    private final AccountService accountService;
+    private final TransferApplicationService transferApplicationService;
+    private final BankReportService reportService;
 
     public BankService(Repository<AccountNumber, BankAccount> accounts, TransferService transferService) {
-        this.accounts = accounts;
-        this.transferService = transferService;
-    }
-
-    public void openAccount(BankAccount account) {
-        if (account == null) {
-            throw new IllegalArgumentException("Account must not be null");
-        }
-        accounts.save(account);
-    }
-
-    public BankAccount findAccount(AccountNumber number) {
-        return accounts.findById(number);
-    }
-
-    public List<BankAccount> findAccounts(Predicate<? super BankAccount> condition) {
-        return CollectionFunctions.filter(accounts.findAll(), condition);
-    }
-
-    public List<BankAccount> findRichAccounts(double minBalance) {
-        return accounts.findAll().stream()
-            .filter(account -> account.getBalance() >= minBalance)
-            .toList();
-    }
-
-    public Optional<BankAccount> findFirstRichAccount(double minBalance) {
-        return accounts.findAll().stream()
-            .filter(account -> account.getBalance() >= minBalance)
-            .findFirst();
-    }
-
-    public double totalBalance() {
-        return accounts.findAll().stream()
-            .mapToDouble(BankAccount::getBalance)
-            .sum();
-    }
-
-    public OptionalDouble averageBalance() {
-        return accounts.findAll().stream()
-            .mapToDouble(BankAccount::getBalance)
-            .average();
-    }
-
-    public Optional<BankAccount> richestAccount() {
-        return accounts.findAll().stream()
-            .max(Comparator.comparingDouble(BankAccount::getBalance));
-    }
-
-    public List<BankAccount> findDebitAccounts() {
-        return accounts.findAll().stream()
-            .filter(DebitAccount.class::isInstance)
-            .toList();
-    }
-
-    public List<BankAccount> findAccountsByOwner(String owner) {
-        return accounts.findAll().stream()
-            .filter(account -> Objects.equals(account.getOwner(), owner))
-            .toList();
-    }
-
-    public boolean hasBlockedAccounts() {
-        return accounts.findAll().stream()
-            .anyMatch(account -> transferService.isAccountBlocked(account.getNumber()));
-    }
-
-    public boolean allAccountsPositive() {
-        return accounts.findAll().stream()
-            .allMatch(account -> account.getBalance() > 0);
-    }
-
-    public boolean noCreditAccounts() {
-        return accounts.findAll().stream()
-            .noneMatch(CreditAccount.class::isInstance);
-    }
-
-    public List<AccountSummary> getAccountSummaries() {
-        return accounts.findAll().stream()
-            .map(this::toSummary)
-            .toList();
-    }
-
-    private AccountSummary toSummary(BankAccount account) {
-        return new AccountSummary(
-            account.getId(),
-            account.getClass().getSimpleName(),
-            account.getBalance()
+        this(
+            new AccountService(accounts),
+            new TransferApplicationService(accounts, transferService),
+            new BankReportService(accounts, number -> transferService.isAccountBlocked(number))
         );
     }
 
+    public BankService(AccountService accountService, TransferApplicationService transferApplicationService,
+                       BankReportService reportService) {
+        this.accountService = accountService;
+        this.transferApplicationService = transferApplicationService;
+        this.reportService = reportService;
+    }
+
+    public void openAccount(BankAccount account) {
+        accountService.open(account);
+    }
+
+    public BankAccount findAccount(AccountNumber number) {
+        return accountService.find(number).orElse(null);
+    }
+
+    public List<BankAccount> findAccounts(Predicate<? super BankAccount> condition) {
+        return accountService.findAccounts(condition);
+    }
+
+    public List<BankAccount> findRichAccounts(double minBalance) {
+        return accountService.findRichAccounts(minBalance);
+    }
+
+    public Optional<BankAccount> findFirstRichAccount(double minBalance) {
+        return accountService.findFirstRichAccount(minBalance);
+    }
+
+    public double totalBalance() {
+        return reportService.totalBalance();
+    }
+
+    public OptionalDouble averageBalance() {
+        return reportService.averageBalance();
+    }
+
+    public Optional<BankAccount> richestAccount() {
+        return reportService.richestAccount();
+    }
+
+    public List<BankAccount> findDebitAccounts() {
+        return accountService.findDebitAccounts();
+    }
+
+    public List<BankAccount> findAccountsByOwner(String owner) {
+        return accountService.findAccountsByOwner(owner);
+    }
+
+    public boolean hasBlockedAccounts() {
+        return reportService.hasBlockedAccounts();
+    }
+
+    public boolean allAccountsPositive() {
+        return reportService.allAccountsPositive();
+    }
+
+    public boolean noCreditAccounts() {
+        return reportService.noCreditAccounts();
+    }
+
+    public List<AccountSummary> getAccountSummaries() {
+        return reportService.getAccountSummaries();
+    }
+
     public List<BankAccount> sortedAccounts(Comparator<? super BankAccount> comparator) {
-        List<BankAccount> result = new ArrayList<>(accounts.findAll());
-        result.sort(comparator);
-        return result;
+        return accountService.sortedAccounts(comparator);
     }
 
     public List<BankAccount> richestFirst() {
-        return accounts.findAll().stream()
-            .sorted(Comparator.comparingDouble(BankAccount::getBalance).reversed())
-            .toList();
+        return accountService.richestFirst();
     }
 
     public List<BankAccount> sortedByNumber() {
-        return accounts.findAll().stream()
-            .sorted(BY_NUMBER)
-            .toList();
+        return accountService.sortedByNumber();
     }
 
     public List<BankAccount> sortedByTypeThenBalance() {
-        Comparator<BankAccount> byTypeThenBalance = Comparator
-            .comparing((BankAccount account) -> account.getClass().getSimpleName())
-            .thenComparingDouble(BankAccount::getBalance);
-        return accounts.findAll().stream()
-            .sorted(byTypeThenBalance)
-            .toList();
+        return accountService.sortedByTypeThenBalance();
     }
 
     public List<BankAccount> sortedByOwnerThenNumber() {
-        Comparator<BankAccount> byOwnerThenNumber = Comparator
-            .comparing(BankAccount::getOwner, Comparator.nullsLast(Comparator.naturalOrder()))
-            .thenComparing(BY_NUMBER);
-        return accounts.findAll().stream()
-            .sorted(byOwnerThenNumber)
-            .toList();
+        return accountService.sortedByOwnerThenNumber();
     }
 
     public boolean closeAccount(AccountNumber number) {
-        return accounts.deleteById(number);
+        return accountService.close(number);
     }
 
     public void transfer(AccountNumber fromNumber, AccountNumber toNumber, double amount) {
-        BankAccount from = accounts.findById(fromNumber);
-        BankAccount to = accounts.findById(toNumber);
-        if (from == null) {
-            throw new IllegalArgumentException("Source account not found");
-        }
-        if (to == null) {
-            throw new IllegalArgumentException("Destination account not found");
-        }
-        transferService.transfer(from, to, amount);
+        transferApplicationService.transfer(fromNumber, toNumber, amount);
     }
 }

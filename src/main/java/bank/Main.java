@@ -11,7 +11,12 @@ public class Main {
             noCommission, console, blockedAccounts, journal
         );
 
-        BankService bank = new BankService(new InMemoryRepository<>(), transferService);
+        Repository<AccountNumber, BankAccount> accounts = new InMemoryRepository<>();
+        BankService bank = new BankService(
+            new AccountService(accounts),
+            new TransferApplicationService(accounts, transferService),
+            new BankReportService(accounts, blockedAccounts::isBlocked)
+        );
         bank.openAccount(new DebitAccount("1234567890", "Ivan", 1000.0));
         bank.openAccount(new DebitAccount("0987654321", "Olga", 2000.0));
 
