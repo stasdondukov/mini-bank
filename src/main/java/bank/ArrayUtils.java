@@ -1,5 +1,8 @@
 package bank;
 
+import java.util.Arrays;
+import java.util.Objects;
+
 public class ArrayUtils {
 
     public static <T> T first(T[] values) {
@@ -20,15 +23,7 @@ public class ArrayUtils {
         if (values == null) {
             return false;
         }
-        for (T element : values) {
-            if (target == null) {
-                if (element == null) {
-                    return true;
-                }
-            } else if (target.equals(element)) {
-                return true;
-            }
-        }
-        return false;
+        return Arrays.stream(values)
+            .anyMatch(element -> Objects.equals(target, element));
     }
 }
