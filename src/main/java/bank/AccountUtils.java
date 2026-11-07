@@ -1,17 +1,14 @@
 package bank;
 
+import java.util.Comparator;
 import java.util.List;
 
 public class AccountUtils {
 
     public static double totalBalance(List<? extends BankAccount> accounts) {
-        double total = 0;
-        for (BankAccount account : accounts) {
-            total += account.getBalance();
-        }
-
-
-        return total;
+        return accounts.stream()
+            .mapToDouble(BankAccount::getBalance)
+            .sum();
     }
 
     public static void addDemoDebitAccounts(List<? super DebitAccount> target) {
@@ -24,15 +21,18 @@ public class AccountUtils {
         if (accounts == null || accounts.isEmpty()) {
             throw new IllegalArgumentException("List of accounts cannot be null or empty");
         }
-        
-        T richestAccount = accounts.get(0);
-        for (int i = 1; i < accounts.size(); i++) {
-            T current = accounts.get(i);
-            if (current.getBalance() > richestAccount.getBalance()) {
-                richestAccount = current;
-            }
+
+        T first = accounts.get(0);
+        if (accounts.size() == 1 || Double.isNaN(first.getBalance())) {
+            return first;
         }
-        
-        return richestAccount;
+
+        return accounts.stream()
+            .filter(account -> !Double.isNaN(account.getBalance()))
+            .max(Comparator.comparingDouble(account -> {
+                double balance = account.getBalance();
+                return balance == 0.0 ? 0.0 : balance;
+            }))
+            .orElseThrow();
     }
 }

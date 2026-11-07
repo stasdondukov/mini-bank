@@ -3,6 +3,7 @@ package bank;
 import org.junit.jupiter.api.Test;
 import java.util.List;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertSame;
 
 public class AccountUtilsTest {
 
@@ -84,5 +85,15 @@ public class AccountUtilsTest {
         );
         DebitAccount richest = AccountUtils.richest(accounts);
         assertEquals("1111111111", richest.getNumber().value());
+    }
+
+    @Test
+    void richestPreservesComparisonOfNaNAndSignedZero() {
+        DebitAccount negativeZero = new DebitAccount("1111111111", "Ivan", -0.0);
+        DebitAccount positiveZero = new DebitAccount("2222222222", "Olga", 0.0);
+        DebitAccount nan = new DebitAccount("3333333333", "Petr", Double.NaN);
+
+        assertSame(negativeZero, AccountUtils.richest(List.of(negativeZero, nan, positiveZero)));
+        assertSame(nan, AccountUtils.richest(List.of(nan, positiveZero)));
     }
 }
