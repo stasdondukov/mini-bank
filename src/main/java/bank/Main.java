@@ -4,11 +4,11 @@ public class Main {
 
     public static void main(String[] args) {
         CommissionPolicy noCommission = amount -> 0.0;
-        NotificationService console = new ConsoleNotificationAdapter();
+        NotificationService notification = new LoggingNotificationDecorator(new ConsoleNotificationAdapter());
         BlockedAccountRegistry blockedAccounts = new BlockedAccountRegistry();
         TransactionJournal journal = new TransactionJournal();
         TransferService transferService = new TransferService(
-            noCommission, console, blockedAccounts, journal
+            noCommission, notification, blockedAccounts, journal
         );
 
         AccountRepository accounts = new InMemoryAccountRepository();
