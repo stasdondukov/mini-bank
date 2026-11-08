@@ -4,14 +4,14 @@ public class Main {
 
     public static void main(String[] args) {
         CommissionPolicy noCommission = amount -> 0.0;
-        NotificationService console = System.out::println;
+        NotificationService console = new ConsoleNotificationAdapter();
         BlockedAccountRegistry blockedAccounts = new BlockedAccountRegistry();
         TransactionJournal journal = new TransactionJournal();
         TransferService transferService = new TransferService(
             noCommission, console, blockedAccounts, journal
         );
 
-        AccountRepository accounts = new AccountRepositoryAdapter(new InMemoryRepository<>());
+        AccountRepository accounts = new InMemoryAccountRepository();
         BankService bank = new BankService(
             new AccountService(accounts),
             new TransferApplicationService(accounts, transferService),
