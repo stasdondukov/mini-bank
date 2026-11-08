@@ -17,11 +17,14 @@ public class Main {
             new TransferApplicationService(accounts, transferService),
             new BankReportService(accounts, blockedAccounts::isBlocked)
         );
-        bank.openAccount(new DebitAccount("1234567890", "Ivan", 1000.0));
-        bank.openAccount(new DebitAccount("0987654321", "Olga", 2000.0));
+        AccountFactory factory = new DefaultAccountFactory();
+        AccountNumber from = new AccountNumber("1234567890");
+        AccountNumber to = new AccountNumber("0987654321");
+        bank.openAccount(factory.create(AccountType.DEBIT, from, "Ivan", 1000.0));
+        bank.openAccount(factory.create(AccountType.DEBIT, to, "Olga", 2000.0));
 
         try {
-            bank.transfer(new AccountNumber("1234567890"), new AccountNumber("0987654321"), 500.0);
+            bank.transfer(from, to, 500.0);
             System.out.println("Transfer completed");
         } catch (InsufficientFundsException e) {
             System.out.println("Transfer failed: " + e.getMessage());
