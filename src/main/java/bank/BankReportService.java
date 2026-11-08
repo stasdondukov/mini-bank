@@ -7,10 +7,10 @@ import java.util.OptionalDouble;
 import java.util.function.Predicate;
 
 public class BankReportService {
-    private final Repository<AccountNumber, BankAccount> accounts;
+    private final AccountRepository accounts;
     private final Predicate<AccountNumber> isBlocked;
 
-    public BankReportService(Repository<AccountNumber, BankAccount> accounts, Predicate<AccountNumber> isBlocked) {
+    public BankReportService(AccountRepository accounts, Predicate<AccountNumber> isBlocked) {
         this.accounts = accounts;
         this.isBlocked = isBlocked;
     }
