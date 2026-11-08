@@ -13,9 +13,9 @@ public class AccountService {
         Comparator.nullsLast(Comparator.comparing(AccountNumber::value))
     );
 
-    private final Repository<AccountNumber, BankAccount> accounts;
+    private final AccountRepository accounts;
 
-    public AccountService(Repository<AccountNumber, BankAccount> accounts) {
+    public AccountService(AccountRepository accounts) {
         this.accounts = accounts;
     }
 
@@ -27,7 +27,7 @@ public class AccountService {
     }
 
     public Optional<BankAccount> find(AccountNumber number) {
-        return Optional.ofNullable(accounts.findById(number));
+        return accounts.findById(number);
     }
 
     public boolean close(AccountNumber number) {

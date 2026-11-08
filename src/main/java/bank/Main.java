@@ -11,7 +11,7 @@ public class Main {
             noCommission, console, blockedAccounts, journal
         );
 
-        Repository<AccountNumber, BankAccount> accounts = new InMemoryRepository<>();
+        AccountRepository accounts = new AccountRepositoryAdapter(new InMemoryRepository<>());
         BankService bank = new BankService(
             new AccountService(accounts),
             new TransferApplicationService(accounts, transferService),

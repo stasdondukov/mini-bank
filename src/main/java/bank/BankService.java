@@ -12,6 +12,10 @@ public class BankService {
     private final BankReportService reportService;
 
     public BankService(Repository<AccountNumber, BankAccount> accounts, TransferService transferService) {
+        this(new AccountRepositoryAdapter(accounts), transferService);
+    }
+
+    private BankService(AccountRepository accounts, TransferService transferService) {
         this(
             new AccountService(accounts),
             new TransferApplicationService(accounts, transferService),
