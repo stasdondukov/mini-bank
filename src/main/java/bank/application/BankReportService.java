@@ -3,7 +3,7 @@ package bank.application;
 import bank.domain.AccountNumber;
 import bank.domain.BankAccount;
 import bank.domain.CreditAccount;
-import bank.ports.AccountRepository;
+import bank.ports.AccountListing;
 
 import java.util.Comparator;
 import java.util.List;
@@ -12,10 +12,10 @@ import java.util.OptionalDouble;
 import java.util.function.Predicate;
 
 public class BankReportService {
-    private final AccountRepository accounts;
+    private final AccountListing accounts;
     private final Predicate<AccountNumber> isBlocked;
 
-    public BankReportService(AccountRepository accounts, Predicate<AccountNumber> isBlocked) {
+    public BankReportService(AccountListing accounts, Predicate<AccountNumber> isBlocked) {
         this.accounts = accounts;
         this.isBlocked = isBlocked;
     }

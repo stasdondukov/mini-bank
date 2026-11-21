@@ -2,15 +2,15 @@ package bank.application;
 
 import bank.domain.AccountNumber;
 import bank.domain.BankAccount;
-import bank.ports.AccountRepository;
+import bank.ports.AccountLookup;
 
 import java.util.Optional;
 
 public class TransferApplicationService {
-    private final AccountRepository accounts;
+    private final AccountLookup accounts;
     private final TransferService transferService;
 
-    public TransferApplicationService(AccountRepository accounts, TransferService transferService) {
+    public TransferApplicationService(AccountLookup accounts, TransferService transferService) {
         this.accounts = accounts;
         this.transferService = transferService;
     }
