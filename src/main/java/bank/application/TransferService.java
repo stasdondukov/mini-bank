@@ -53,6 +53,7 @@ public class TransferService {
             journal.size() + 1L,
             TransactionType.TRANSFER,
             from.getNumber(),
+            to.getNumber(),
             amount,
             TransactionStatus.SUCCESS
         );
