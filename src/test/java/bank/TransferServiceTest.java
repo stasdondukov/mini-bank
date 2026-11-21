@@ -10,6 +10,67 @@ import static org.junit.jupiter.api.Assertions.*;
 public class TransferServiceTest {
 
     @Test
+    void publishesRecordedTransferToEveryListenerAfterBalancesChange() {
+        BankAccount from = new DebitAccount("0000000001", "A", 5000);
+        BankAccount to = new DebitAccount("0000000002", "B", 1000);
+        TransactionJournal journal = new TransactionJournal();
+        List<Transaction> received = new ArrayList<>();
+        TransferEventPublisher events = new TransferEventPublisher();
+        events.subscribe(transaction -> {
+            assertEquals(3000, from.getBalance());
+            assertEquals(3000, to.getBalance());
+            assertSame(transaction, journal.findAll().get(0));
+            received.add(transaction);
+        });
+        events.subscribe(received::add);
+        TransferService service = new TransferService(
+            new NoCommission(), events, new BlockedAccountRegistry(), journal
+        );
+
+        service.transfer(from, to, 2000);
+
+        assertEquals(2, received.size());
+        assertSame(received.get(0), received.get(1));
+    }
+
+    @Test
+    void failedTransferDoesNotPublishCompletion() {
+        BankAccount from = new DebitAccount("0000000001", "A", 500);
+        BankAccount to = new DebitAccount("0000000002", "B", 1000);
+        TransactionJournal journal = new TransactionJournal();
+        List<Transaction> received = new ArrayList<>();
+        TransferEventPublisher events = new TransferEventPublisher();
+        events.subscribe(received::add);
+        TransferService service = new TransferService(
+            new NoCommission(), events, new BlockedAccountRegistry(), journal
+        );
+
+        assertThrows(InsufficientFundsException.class, () -> service.transfer(from, to, 2000));
+        assertTrue(received.isEmpty());
+        assertEquals(0, journal.size());
+    }
+
+    @Test
+    void listenerFailureStillAllowsOtherListenersToReceiveTheEvent() {
+        BankAccount from = new DebitAccount("0000000001", "A", 5000);
+        BankAccount to = new DebitAccount("0000000002", "B", 1000);
+        TransactionJournal journal = new TransactionJournal();
+        List<Transaction> received = new ArrayList<>();
+        TransferEventPublisher events = new TransferEventPublisher();
+        IllegalStateException failure = new IllegalStateException("Listener failed");
+        events.subscribe(transaction -> { throw failure; });
+        events.subscribe(received::add);
+        TransferService service = new TransferService(
+            new NoCommission(), events, new BlockedAccountRegistry(), journal
+        );
+
+        assertSame(failure, assertThrows(IllegalStateException.class, () -> service.transfer(from, to, 2000)));
+        assertEquals(journal.findAll(), received);
+        assertEquals(3000, from.getBalance());
+        assertEquals(3000, to.getBalance());
+    }
+
+    @Test
     void transferWithoutCommissionUsesLambdaNotification() {
         BankAccount from = new DebitAccount("0000000001", "A", 5000.0);
         BankAccount to = new DebitAccount("0000000002", "B", 1000.0);

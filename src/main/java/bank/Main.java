@@ -5,10 +5,13 @@ public class Main {
     public static void main(String[] args) {
         CommissionPolicy noCommission = amount -> 0.0;
         NotificationService notification = new LoggingNotificationDecorator(new ConsoleNotificationAdapter());
+        TransferEventPublisher events = new TransferEventPublisher();
+        events.subscribe(new TransferNotificationListener(notification));
+        events.subscribe(transaction -> System.out.println("Transfer completed"));
         BlockedAccountRegistry blockedAccounts = new BlockedAccountRegistry();
         TransactionJournal journal = new TransactionJournal();
         TransferService transferService = new TransferService(
-            noCommission, notification, blockedAccounts, journal
+            noCommission, events, blockedAccounts, journal
         );
 
         AccountRepository accounts = new InMemoryAccountRepository();
@@ -25,7 +28,6 @@ public class Main {
 
         try {
             bank.transfer(from, to, 500.0);
-            System.out.println("Transfer completed");
         } catch (InsufficientFundsException e) {
             System.out.println("Transfer failed: " + e.getMessage());
         } catch (TransferLimitExceededException e) {
