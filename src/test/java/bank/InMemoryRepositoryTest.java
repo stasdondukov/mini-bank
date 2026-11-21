@@ -1,5 +1,12 @@
 package bank;
 
+import bank.adapters.InMemoryRepository;
+import bank.domain.AccountNumber;
+import bank.domain.BankAccount;
+import bank.domain.DebitAccount;
+import bank.domain.Identifiable;
+import bank.ports.Repository;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 

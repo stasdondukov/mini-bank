@@ -1,5 +1,17 @@
 package bank;
 
+import bank.application.BlockedAccountRegistry;
+import bank.application.TransactionJournal;
+import bank.application.TransferService;
+import bank.domain.BankAccount;
+import bank.domain.CommissionPolicy;
+import bank.domain.DebitAccount;
+import bank.domain.FixedCommissionPolicy;
+import bank.domain.NoCommission;
+import bank.domain.ProgressiveCommissionPolicy;
+import bank.domain.VipCommissionPolicy;
+import bank.domain.WeekendCommissionPolicy;
+
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;

@@ -1,5 +1,9 @@
 package bank;
 
+import bank.domain.BankAccount;
+import bank.domain.DebitAccount;
+import bank.domain.SavingsAccount;
+
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;

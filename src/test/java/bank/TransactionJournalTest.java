@@ -1,5 +1,11 @@
 package bank;
 
+import bank.application.TransactionJournal;
+import bank.domain.AccountNumber;
+import bank.domain.Transaction;
+import bank.domain.TransactionStatus;
+import bank.domain.TransactionType;
+
 import org.junit.jupiter.api.Test;
 
 import java.util.List;

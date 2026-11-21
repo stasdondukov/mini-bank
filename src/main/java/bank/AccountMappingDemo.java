@@ -1,5 +1,12 @@
 package bank;
 
+import bank.application.AccountSummary;
+import bank.application.CollectionFunctions;
+import bank.domain.BankAccount;
+import bank.domain.CreditAccount;
+import bank.domain.DebitAccount;
+import bank.domain.SavingsAccount;
+
 import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Function;

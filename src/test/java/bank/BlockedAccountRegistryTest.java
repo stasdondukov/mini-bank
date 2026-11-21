@@ -1,5 +1,8 @@
 package bank;
 
+import bank.application.BlockedAccountRegistry;
+import bank.domain.AccountNumber;
+
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;

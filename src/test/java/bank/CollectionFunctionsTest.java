@@ -1,5 +1,13 @@
 package bank;
 
+import bank.application.AccountSummary;
+import bank.application.CollectionFunctions;
+import bank.domain.AccountNumber;
+import bank.domain.BankAccount;
+import bank.domain.CreditAccount;
+import bank.domain.DebitAccount;
+import bank.domain.SavingsAccount;
+
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;

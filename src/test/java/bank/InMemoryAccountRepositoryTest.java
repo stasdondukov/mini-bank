@@ -1,5 +1,11 @@
 package bank;
 
+import bank.adapters.InMemoryAccountRepository;
+import bank.domain.AccountNumber;
+import bank.domain.BankAccount;
+import bank.domain.DebitAccount;
+import bank.ports.AccountRepository;
+
 import org.junit.jupiter.api.Test;
 
 import java.util.List;

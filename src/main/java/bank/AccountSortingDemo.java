@@ -1,5 +1,14 @@
 package bank;
 
+import bank.adapters.InMemoryRepository;
+import bank.application.BlockedAccountRegistry;
+import bank.application.TransactionJournal;
+import bank.application.TransferService;
+import bank.domain.BankAccount;
+import bank.domain.CreditAccount;
+import bank.domain.DebitAccount;
+import bank.domain.SavingsAccount;
+
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;

@@ -1,5 +1,10 @@
 package bank;
 
+import bank.domain.BankAccount;
+import bank.domain.CreditAccount;
+import bank.domain.DebitAccount;
+import bank.domain.SavingsAccount;
+
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 

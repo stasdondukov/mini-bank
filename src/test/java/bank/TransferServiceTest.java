@@ -1,5 +1,25 @@
 package bank;
 
+import bank.application.BlockedAccountRegistry;
+import bank.application.TransactionJournal;
+import bank.application.TransferEventPublisher;
+import bank.application.TransferService;
+import bank.domain.AccountNumber;
+import bank.domain.BankAccount;
+import bank.domain.CommissionPolicy;
+import bank.domain.CreditAccount;
+import bank.domain.DebitAccount;
+import bank.domain.InsufficientFundsException;
+import bank.domain.InvalidAmountException;
+import bank.domain.NoCommission;
+import bank.domain.PercentCommission;
+import bank.domain.SavingsAccount;
+import bank.domain.Transaction;
+import bank.domain.TransactionStatus;
+import bank.domain.TransactionType;
+import bank.domain.TransferLimitExceededException;
+import bank.ports.NotificationService;
+
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;

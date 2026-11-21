@@ -1,5 +1,18 @@
 package bank;
 
+import bank.adapters.AccountRepositoryAdapter;
+import bank.adapters.InMemoryRepository;
+import bank.application.AccountService;
+import bank.application.BankReportService;
+import bank.application.BlockedAccountRegistry;
+import bank.application.TransactionJournal;
+import bank.application.TransferApplicationService;
+import bank.application.TransferService;
+import bank.domain.AccountNumber;
+import bank.domain.BankAccount;
+import bank.domain.DebitAccount;
+import bank.ports.AccountRepository;
+
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
