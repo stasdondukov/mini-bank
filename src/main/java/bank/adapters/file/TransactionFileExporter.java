@@ -11,9 +11,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class TransactionFileExporter {
+    static final String HEADER = "id;from;to;amount;status";
+
     public void export(Path path, List<Transaction> transactions) throws IOException {
         List<String> lines = new ArrayList<>();
-        lines.add("id;from;to;amount;status");
+        lines.add(HEADER);
         lines.addAll(transactions.stream()
             .map(TransactionDto::fromDomain)
             .map(this::formatLine)
