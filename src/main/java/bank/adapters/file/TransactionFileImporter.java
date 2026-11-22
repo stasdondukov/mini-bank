@@ -5,13 +5,24 @@ import bank.domain.TransactionStatus;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Stream;
 
 public class TransactionFileImporter {
+    public long countSuccessful(Path path) throws IOException {
+        String successfulStatus = ";" + TransactionStatus.SUCCESS.name();
+        try (Stream<String> lines = Files.lines(path)) {
+            return lines.filter(line -> line.endsWith(successfulStatus)).count();
+        } catch (UncheckedIOException exception) {
+            throw exception.getCause();
+        }
+    }
+
     public List<TransactionDto> load(Path path) throws IOException {
         List<TransactionDto> transactions = new ArrayList<>();
         try (BufferedReader reader = Files.newBufferedReader(path, StandardCharsets.UTF_8)) {

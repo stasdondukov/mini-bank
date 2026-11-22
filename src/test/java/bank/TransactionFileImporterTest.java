@@ -29,6 +29,29 @@ class TransactionFileImporterTest {
     Path tempDir;
 
     @Test
+    void countsOnlyRowsWhoseStatusIsExactlySuccess() throws IOException {
+        Path path = tempDir.resolve("statistics.txt");
+        Files.write(path, List.of(
+            "id;from;to;amount;status",
+            "1;1111111111;2222222222;1000.0;SUCCESS",
+            "2;1111111111;;150.5;SUCCESS",
+            "3;1111111111;2222222222;200.0;REJECTED",
+            "4;1111111111;2222222222;500.0;NOT_SUCCESS",
+            "5;SUCCESS;2222222222;100.0;REJECTED"
+        ));
+
+        assertEquals(2L, importer.countSuccessful(path));
+    }
+
+    @Test
+    void reportsReadErrorsAsIOException() throws IOException {
+        Path path = tempDir.resolve("invalid-encoding.txt");
+        Files.write(path, new byte[] {(byte) 0xFF});
+
+        assertThrows(IOException.class, () -> importer.countSuccessful(path));
+    }
+
+    @Test
     void loadsExporterOutputInOrderWithLeadingZeroesAndMissingAccounts() throws IOException {
         Path path = tempDir.resolve("transactions.txt");
         AccountNumber from = new AccountNumber("0000000001");
