@@ -17,6 +17,21 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class JsonStorageTest {
     @Test
+    void loadsSavedAccountsInOrderAsDtos(@TempDir Path tempDir) throws IOException {
+        Path path = tempDir.resolve("accounts.json");
+        List<AccountDto> accounts = List.of(
+            new AccountDto("0000000001", "Иван", 1500.5, "DebitAccount"),
+            new AccountDto("0000000002", "Ольга", -250.0, "CreditAccount")
+        );
+        JsonStorage storage = new JsonStorage();
+        storage.saveAccounts(path, accounts);
+
+        List<AccountDto> loaded = storage.loadAccounts(path);
+
+        assertEquals(accounts, loaded);
+    }
+
+    @Test
     void savesAccountsAsFormattedJsonWithStringAccountNumbers(@TempDir Path tempDir) throws IOException {
         Path path = tempDir.resolve("accounts.json");
         List<AccountDto> accounts = List.of(
