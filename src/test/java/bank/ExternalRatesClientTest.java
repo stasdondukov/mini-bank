@@ -1,10 +1,13 @@
 package bank;
 
+import bank.adapters.dto.RateDto;
 import bank.adapters.http.ExternalRatesClient;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.sun.net.httpserver.HttpServer;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
@@ -16,7 +19,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class ExternalRatesClientTest {
-    private static final String BODY = "{\"rate\":1.25}";
+    private static final String BODY = "{\"currency\":\"EUR\",\"value\":1.25}";
     private HttpServer server;
 
     @BeforeEach
@@ -51,7 +54,34 @@ class ExternalRatesClientTest {
         assertEquals("HTTP error: " + status, error.getMessage());
     }
 
+    @Test
+    void readsSuccessfulResponseAsRateDto() throws IOException, InterruptedException {
+        String url = respondWith(200);
+
+        assertEquals(new RateDto("EUR", 1.25), new ExternalRatesClient().getRate(url));
+    }
+
+    @Test
+    void reportsMalformedJsonFromSuccessfulResponse() {
+        String url = respondWith(200, "not JSON");
+
+        assertThrows(JsonProcessingException.class, () -> new ExternalRatesClient().getRate(url));
+    }
+
+    @Test
+    void rejectsHttpErrorBeforeParsingTheBody() {
+        String url = respondWith(503, "not JSON");
+
+        IllegalStateException error = assertThrows(IllegalStateException.class,
+            () -> new ExternalRatesClient().getRate(url));
+        assertEquals("HTTP error: 503", error.getMessage());
+    }
+
     private String respondWith(int status) {
+        return respondWith(status, BODY);
+    }
+
+    private String respondWith(int status, String responseBody) {
         server.createContext("/rates", exchange -> {
             try {
                 if (!"GET".equals(exchange.getRequestMethod())) {
@@ -59,7 +89,7 @@ class ExternalRatesClientTest {
                 } else if (status == 204) {
                     exchange.sendResponseHeaders(status, -1);
                 } else {
-                    byte[] body = BODY.getBytes(StandardCharsets.UTF_8);
+                    byte[] body = responseBody.getBytes(StandardCharsets.UTF_8);
                     exchange.sendResponseHeaders(status, body.length);
                     exchange.getResponseBody().write(body);
                 }
