@@ -6,6 +6,7 @@ import bank.application.AccountSummary;
 import bank.application.BankReportService;
 import bank.application.TransferApplicationService;
 import bank.application.TransferService;
+import bank.application.annotation.RequiresRole;
 import bank.domain.AccountNumber;
 import bank.domain.BankAccount;
 import bank.ports.AccountRepository;
@@ -117,6 +118,7 @@ public class BankService {
         return accountService.sortedByOwnerThenNumber();
     }
 
+    @RequiresRole("ADMIN")
     public boolean closeAccount(AccountNumber number) {
         return accountService.close(number);
     }

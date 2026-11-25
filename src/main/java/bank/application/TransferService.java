@@ -1,5 +1,6 @@
 package bank.application;
 
+import bank.application.annotation.Audited;
 import bank.domain.AccountNumber;
 import bank.domain.BankAccount;
 import bank.domain.CommissionPolicy;
@@ -10,6 +11,7 @@ import bank.domain.TransactionType;
 import bank.domain.TransferLimitExceededException;
 import bank.ports.NotificationService;
 
+@Audited
 public class TransferService {
     private final CommissionPolicy commissionPolicy;
     private final TransferEventPublisher events;
