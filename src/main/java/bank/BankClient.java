@@ -11,6 +11,7 @@ final class BankClient implements Runnable {
     private final int operations;
     private int succeeded;
     private int rejected;
+    private int errors;
 
     BankClient(ConcurrentBank bank, AccountNumber from, AccountNumber to, int operations) {
         this.bank = bank;
@@ -30,6 +31,8 @@ final class BankClient implements Runnable {
                 succeeded++;
             } catch (InsufficientFundsException | TransferLimitExceededException e) {
                 rejected++;
+            } catch (RuntimeException e) {
+                errors++;
             }
         }
     }
@@ -40,5 +43,9 @@ final class BankClient implements Runnable {
 
     int rejected() {
         return rejected;
+    }
+
+    int errors() {
+        return errors;
     }
 }

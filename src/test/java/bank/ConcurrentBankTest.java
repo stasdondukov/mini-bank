@@ -41,12 +41,15 @@ class ConcurrentBankTest {
         assertFalse(thread.isAlive());
         assertEquals(1, client.rejected());
         assertEquals(1, client.succeeded());
+        assertEquals(0, client.errors());
         assertEquals(1, journal.size());
         assertEquals(500_000.0, totalBalance());
     }
 
     @Test
     void concurrentTransfersPreserveTotalInEverySnapshot() throws InterruptedException {
+        double initialTotal = bank.totalBalance();
+        assertEquals(500_000.0, initialTotal);
         List<Thread> threads = new ArrayList<>();
         for (int i = 0; i < numbers.size(); i++) {
             AccountNumber from = numbers.get(i);
@@ -70,6 +73,7 @@ class ConcurrentBankTest {
 
             assertEquals(9_960, journal.size());
             assertEquals(500_000.0, totalBalance());
+            assertEquals(initialTotal, bank.totalBalance());
         } finally {
             for (Thread thread : threads) {
                 thread.interrupt();
@@ -77,7 +81,27 @@ class ConcurrentBankTest {
         }
     }
 
+    @Test
+    void unsynchronizedModePreservesTotalForSingleClient() throws InterruptedException {
+        ConcurrentBank unsafeBank = createBank(false);
+        double initialTotal = unsafeBank.totalBalance();
+        BankClient client = new BankClient(unsafeBank, numbers.get(0), numbers.get(1), 2);
+        Thread thread = new Thread(client);
+        thread.start();
+        thread.join(5_000);
+
+        assertFalse(thread.isAlive());
+        assertEquals(1, client.succeeded());
+        assertEquals(1, client.rejected());
+        assertEquals(0, client.errors());
+        assertEquals(initialTotal, unsafeBank.totalBalance());
+    }
+
     private ConcurrentBank createBank() {
+        return createBank(true);
+    }
+
+    private ConcurrentBank createBank(boolean synchronizedTransfers) {
         AccountRepository accounts = new InMemoryAccountRepository();
         for (AccountNumber number : numbers) {
             accounts.save(new DebitAccount(number, "Owner", 100_000));
@@ -88,7 +112,8 @@ class ConcurrentBankTest {
         );
         return new ConcurrentBank(
             new TransferApplicationService(accounts, service),
-            new BankReportService(accounts, blockedAccounts::isBlocked)
+            new BankReportService(accounts, blockedAccounts::isBlocked),
+            synchronizedTransfers
         );
     }
 
