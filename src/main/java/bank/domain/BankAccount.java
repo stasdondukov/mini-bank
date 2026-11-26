@@ -18,14 +18,14 @@ public abstract class BankAccount implements Identifiable<AccountNumber> {
         this(new AccountNumber(number), owner, initialBalance);
     }
 
-    public void deposit(double amount) {
+    public synchronized void deposit(double amount) {
         if (amount <= 0) {
             throw new InvalidAmountException("Amount must be positive");
         }
         this.balance += amount;
     }
 
-    public void withdraw(double amount) {
+    public synchronized void withdraw(double amount) {
         if (amount <= 0) {
             throw new IllegalArgumentException("Amount must be positive");
         }
@@ -50,15 +50,15 @@ public abstract class BankAccount implements Identifiable<AccountNumber> {
 
     protected abstract double getAvailableAmount();
 
-    protected void decreaseBalance(double amount) {
+    protected synchronized void decreaseBalance(double amount) {
         this.balance -= amount;
     }
 
-    public double getBalance() {
+    public synchronized double getBalance() {
         return balance;
     }
 
-    protected void setBalance(double balance) {
+    protected synchronized void setBalance(double balance) {
         this.balance = balance;
     }
 
@@ -87,7 +87,7 @@ public abstract class BankAccount implements Identifiable<AccountNumber> {
         return getClass().getSimpleName() + "{" +
                 "number='" + number.value() + '\'' +
                 ", owner='" + owner + '\'' +
-                ", balance=" + balance +
+                ", balance=" + getBalance() +
                 '}';
     }
 
