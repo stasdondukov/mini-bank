@@ -51,15 +51,18 @@ public class TransferService {
         }
         double commission = commissionPolicy.calculate(amount);
         from.transferTo(to, amount, commission);
-        Transaction transaction = new Transaction(
-            journal.size() + 1L,
-            TransactionType.TRANSFER,
-            from.getNumber(),
-            to.getNumber(),
-            amount,
-            TransactionStatus.SUCCESS
-        );
-        journal.add(transaction);
+        Transaction transaction;
+        synchronized (journal) {
+            transaction = new Transaction(
+                journal.size() + 1L,
+                TransactionType.TRANSFER,
+                from.getNumber(),
+                to.getNumber(),
+                amount,
+                TransactionStatus.SUCCESS
+            );
+            journal.add(transaction);
+        }
         events.publish(transaction);
     }
 }

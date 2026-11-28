@@ -12,20 +12,20 @@ public class TransactionJournal {
     private final List<Transaction> transactions = new ArrayList<>();
     private final TransactionIndex index = new TransactionIndex();
 
-    public void add(Transaction transaction) {
+    public synchronized void add(Transaction transaction) {
         index.add(transaction);
         transactions.add(transaction);
     }
 
-    public List<Transaction> findAll() {
+    public synchronized List<Transaction> findAll() {
         return new ArrayList<>(transactions);
     }
 
-    public List<Transaction> findByAccount(AccountNumber number) {
+    public synchronized List<Transaction> findByAccount(AccountNumber number) {
         return index.findByAccount(number);
     }
 
-    public void removeRejected() {
+    public synchronized void removeRejected() {
         Iterator<Transaction> iterator = transactions.iterator();
         while (iterator.hasNext()) {
             Transaction tx = iterator.next();
@@ -36,7 +36,7 @@ public class TransactionJournal {
         }
     }
 
-    public int size() {
+    public synchronized int size() {
         return transactions.size();
     }
 }

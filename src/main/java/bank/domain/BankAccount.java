@@ -1,6 +1,9 @@
 package bank.domain;
 
+import java.util.Objects;
+
 public abstract class BankAccount implements Identifiable<AccountNumber> {
+    private static final Object EQUAL_HASH_LOCK = new Object();
     private final AccountNumber number;
     private final String owner;
     private double balance;
@@ -36,6 +39,31 @@ public abstract class BankAccount implements Identifiable<AccountNumber> {
     }
 
     public void transferTo(BankAccount destination, double amount, double commission) {
+        Objects.requireNonNull(destination);
+        int sourceHash = System.identityHashCode(this);
+        int destinationHash = System.identityHashCode(destination);
+
+        if (sourceHash == destinationHash && this != destination) {
+            synchronized (EQUAL_HASH_LOCK) {
+                transferWithLocks(destination, amount, commission, true);
+            }
+        } else {
+            transferWithLocks(destination, amount, commission, sourceHash <= destinationHash);
+        }
+    }
+
+    private void transferWithLocks(BankAccount destination, double amount, double commission,
+                                   boolean sourceFirst) {
+        BankAccount first = sourceFirst ? this : destination;
+        BankAccount second = sourceFirst ? destination : this;
+        synchronized (first) {
+            synchronized (second) {
+                transferLocked(destination, amount, commission);
+            }
+        }
+    }
+
+    private void transferLocked(BankAccount destination, double amount, double commission) {
         double sourceBalance = getBalance();
         double destinationBalance = destination.getBalance();
         try {
